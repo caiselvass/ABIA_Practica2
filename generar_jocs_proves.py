@@ -12,7 +12,7 @@ while True:
 		continue
 	break
 
-books = set()
+books = [[] for _ in range(n_tests)]
 
 hp_books = [
 	'pre',
@@ -42,17 +42,22 @@ hg_books = [
 while True:
 	try:
 		books_list = input("Introdueix les paraules clau de les sagues famoses de llibres separades per comes. Deixa-ho en blanc (buit) si no en vols incloure cap. [HELP per més detalls]:\n").replace(' ', '').split(',')
+		for b in books_list:
+			if b not in {'HP', 'LR', 'HG', 'HELP', 'help', ''}:
+				raise ValueError
 		if len(books_list) == 1 and books_list[0] in {'HELP', 'help'}:
 			print(f"Pots escriure les següents paraules clau per incloure sagues famoses de llibres:\n    1) HP per incloure tots els 7 llibres de Harry Potter.\n    2) LR per incloure tots els 3 llibres del Senyor dels Anells (The Lord of the Rings).\n    3) HG per incloure tots els 3 llibres de la saga dels Jocs de la Fam (Hunger Games).")
 			continue
 		else:
 			if 'HP' in books_list:
-				books.add(hp_books)
+				for test_books in books:
+					test_books.append(hp_books)
 			if 'LR' in books_list:
-				books.add(lr_books)
+				for test_books in books:
+					test_books.append(lr_books)
 			if 'HG' in books_list:
-				books.add(hg_books)
-
+				for test_books in books:
+					test_books.append(hg_books)
 	except ValueError:
 		print("Error: Els valors no són vàlids.")
 		continue
@@ -74,29 +79,39 @@ while True:
 					print("Error: Introdueix un nombre enter.")
 					continue
 				break
-			addi_books = rng.randint(0, addi_books)
+			addi_books_list = [rng.randint(0, addi_books) for _ in range(n_tests)]
 	except ValueError:
 		print("Error: Introdueix un nombre enter >= 0.")
 		continue
 	break
 
-random_predecessors = ['pre']
-random_parallels = ['par']
-for i in range(1, addi_books + 1):
-	if rng.choice([True, False]):
-		random_predecessors.append(f'book_pre_{i}')
-	else:
-		random_parallels.append(f'book_par_{i}')
-	
+for test_list in books:
+	random_predecessors = ['pre']
+	random_parallels = ['par']
+
+	for i in range(1, addi_books + 1):
+		if rng.choice([True, False]):
+			random_predecessors.append(f'book_pre_{i}')
+		else:
+			random_parallels.append(f'book_par_{i}')
+		
 	if len(random_predecessors) > 1:
-		books.add(random_predecessors)
+		if len(random_predecessors) == 2:
+			random_predecessors[0] = 'single'
+		test_list.append(random_predecessors)
+	
 	if len(random_parallels) > 1:
-		books.add(random_parallels)
+		if len(random_parallels) == 2:
+			random_parallels[0] = 'single'
+		test_list.append(random_parallels)
 
-for group_books in books:
-	print(group_books)
+for t, test_list in enumerate(books):
+	print(f"\n---------- JOC DE PROVES [{t+1}] ----------")
+	for group_books in test_list:
+		print(group_books)
+	
 
-# Generació dels jocs de proves
+"""# Generació dels jocs de proves
 for i in range(n_tests):
 	with open(f'problem{i}.pddl', 'w') as file:
 		# HEADER
@@ -106,5 +121,5 @@ for i in range(n_tests):
 		books_str = ' '.join(books)
 		months = 'Past January February March April May June July August September October November December'
 
-		file.write(f'\t;;Objects\n(:objects\n{months} - months\n{books_str} - books)\n')
+		file.write(f'\t;;Objects\n(:objects\n{months} - months\n{books_str} - books)\n')"""
 
