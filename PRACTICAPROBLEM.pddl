@@ -3,7 +3,7 @@
     ;; Objects
     (:objects
         book1 book2 book3 book4 book5 book6 book7 book8 book9 book10 book11 book12 book13 book14 book15 - book
-        month0 month1 month2 month3 month4 month5 month6 month7 month8 month9 month10 month11 month12 - month
+        Past January February March April May June July August September October November December - month
     )
 
     ;; Initial State
