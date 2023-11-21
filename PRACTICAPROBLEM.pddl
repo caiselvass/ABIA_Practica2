@@ -1,7 +1,8 @@
-(define (problem reading_plan_problem) (:domain reading_plan)
+(define (problem reading_plan_problem)
+    (:domain reading_plan)
     ;; Objects
     (:objects
-        book1 book2 book3 book4 book5 book6 book7 book8 book9 book10 - book
+        book1 book2 book3 book4 book5 book6 book7 book8 book9 book10 book11 book12 book13 book14 book15 - book
         month0 month1 month2 month3 month4 month5 month6 month7 month8 month9 month10 month11 month12 - month
     )
 
@@ -13,27 +14,42 @@
         (next_month month7 month8) (next_month month8 month9) (next_month month9 month10)
         (next_month month10 month11) (next_month month11 month12)
 
-        ;; Precedessors and parallel books
+        ;; Predecessors and parallel books
         (predecessor book1 book2)
         (predecessor book2 book3)
         (predecessor book3 book4)
-        (predecessor book4 book5)
-        (predecessor book5 book6)
-        (predecessor book6 book7)
+        (parallel book5 book1)
+        (parallel book5 book6)
+        (parallel book5 book8)
+
+        ;; Books the user would like to read
+        (goal_book book5)
+        (goal_book book6)
+        (goal_book book8)
+
+
 
         ;; Read books
-        (assigned book4 month0)
-        (read book4)
-
+        (assigned book1 month0)
+        (read book1)
+        (goal_book book1)
 
         ;; Pages of each book
         (= (total_pages book1) 700)
-        (= (total_pages book2) 550)
+        (= (total_pages book2) 350)
         (= (total_pages book3) 200)
         (= (total_pages book4) 150)
         (= (total_pages book5) 100)
         (= (total_pages book6) 180)
         (= (total_pages book7) 220)
+        (= (total_pages book8) 320)
+        (= (total_pages book9) 410)
+        (= (total_pages book10) 275)
+        (= (total_pages book11) 300)
+        (= (total_pages book12) 250)
+        (= (total_pages book13) 200)
+        (= (total_pages book14) 150)
+        (= (total_pages book15) 100)
 
         ;; Initial pages read per month
         (= (pages_read month1) 0)
@@ -62,8 +78,8 @@
     ;; Goal
     (:goal
         (and
-            ;; Books that the user would like to read
-            (read book7)
+            ;; Imply goal_read -> read for each book
+            (forall (?b - book) (imply (goal_book ?b) (read ?b)))
         )
     )
 

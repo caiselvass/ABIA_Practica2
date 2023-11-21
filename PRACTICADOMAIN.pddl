@@ -11,6 +11,7 @@
         (read ?b - book)
         (predecessor ?b1 - book ?b2 - book)
         (parallel ?b1 - book ?b2 - book)
+        (goal_book ?b - book) ; New predicate for goal books
         (assigned ?b - book ?m - month)
         (month_finished ?m - month)
         (actual_month ?m - month)
@@ -29,14 +30,15 @@
     (:action assign_book
         :parameters (?b - book ?actualm - month ?prevm - month)
         :precondition (and
-            (not (assigned ?b ?actualm))
             (not (read ?b))
+            (or (goal_book ?b) (exists (?x - book) (predecessor ?b ?x)))
             (actual_month ?actualm)
             (previous_month ?prevm)
             ;; The predecessors must have been read before the book's month
             (forall (?pre - book) (imply (predecessor ?pre ?b) (and (read ?pre) (not (assigned ?pre ?actualm)))))
-            ;; The parallel books must have been read before the book's month or in the same month
-            (forall (?par - book) (imply (or (parallel ?b ?par) (parallel ?par ?b)) (or (assigned ?par ?actualm) (and (assigned ?par ?prevm) (read ?par)))))
+            ;; The parallel books must be a goal to be read before the book's month or in the same month
+            (forall (?par - book) (imply (and (parallel ?b ?par) (goal_book ?par)) (or (assigned ?par ?actualm) (assigned ?par ?prevm))))
+
             (<= (+ (pages_read ?actualm) (total_pages ?b)) 800)
         )
         :effect (and
@@ -46,14 +48,14 @@
         )
     )
 
+
+
     (:action start_month
         :parameters (?nextm - month ?actualm - month ?prevm - month)
         :precondition (and 
             (actual_month ?actualm)
             (previous_month ?prevm)
             (next_month ?actualm ?nextm)
-            ;; Change the actual month only if the previous month is finished
-            (forall (?b - book) (imply (assigned ?b ?actualm) (read ?b)))
         )
         :effect (and
             (month_finished ?actualm)
@@ -64,5 +66,4 @@
             (increase (num_months_created) 1) 
         )
     )
-
 )
