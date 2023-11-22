@@ -1,10 +1,36 @@
 # Importació de llibreries
-import random
+import numpy as np
+import networkx as nx
 
-# Preguntes inicials a l'usuari
+# Definició de classe Book
+class Book:
+	def __init__(self, name: str, pages: int):
+		self.name = name
+		self.pages = pages
+
+	def __repr__(self) -> str:
+		return f'{self.name}'
+
+# Nivell d'extensió dels jocs de proves
 while True:
 	try:
-		n_tests = int(input("Introdueix el nombre de jocs de proves que vols generar: "))
+		level = input("Introdueix el nivell d'extensio dels jocs de proves que vols generar [B/1/2/3]: ").replace(' ', '')
+		if level not in {'B', 'b', '1', '2', '3'}:
+			raise ValueError
+		else:
+			if level in {'B', 'b'}:
+				level = 0
+			else:
+				level = int(level)
+	except ValueError:
+		print("Error: Introdueix només un dels següents valors: B, 1, 2, 3.")
+		continue
+	break
+
+# Nombre de jocs de proves a generar
+while True:
+	try:
+		n_tests = int(input(f"Introdueix el nombre de jocs de proves amb nivell d'extensió '{'B' if level == 0 else level}' que vols generar: ").replace(' ', ''))
 		if n_tests < 1:
 			raise ValueError
 	except ValueError:
@@ -12,33 +38,50 @@ while True:
 		continue
 	break
 
-books = [[] for _ in range(n_tests)]
+# Inicialitzacions del les sagues de llibres famoses
+graphs = [nx.DiGraph() for _ in range(n_tests)]
 
-hp_books = [
-	'pre',
-    ['HP1_Harry_Potter_and_the_Philosopher\'s_Stone', 223],
-    ['HP2_Harry_Potter_and_the_Chamber_of_Secrets', 251],
-    ['HP3_Harry_Potter_and_the_Prisoner_of_Azkaban', 317],
-    ['HP4_Harry_Potter_and_the_Goblet_of_Fire', 636],
-    ['HP5_Harry_Potter_and_the_Order_of_the_Phoenix', 766],
-    ['HP6_Harry_Potter_and_the_Half-Blood_Prince', 607],
-    ['HP7_Harry_Potter_and_the_Deathly_Hallows', 607]
+# Llibres de la saga de Harry Potter
+hp_list = [
+    ['HP1_Harry_Potter_and_the_Philosopher\'s_Stone', 220],
+    ['HP2_Harry_Potter_and_the_Chamber_of_Secrets', 250],
+    ['HP3_Harry_Potter_and_the_Prisoner_of_Azkaban', 315],
+    ['HP4_Harry_Potter_and_the_Goblet_of_Fire', 635],
+    ['HP5_Harry_Potter_and_the_Order_of_the_Phoenix', 765],
+    ['HP6_Harry_Potter_and_the_Half-Blood_Prince', 605],
+    ['HP7_Harry_Potter_and_the_Deathly_Hallows', 605]
 ]
+hp_books = [Book(name, pages) for name, pages in hp_list]
+hp_graph = nx.DiGraph()
+hp_graph.add_nodes_from(hp_books)
+for i in range(len(hp_books) - 1):
+	hp_graph.add_edge(hp_books[i], hp_books[i+1], name='predecessor')
 
-lr_books = [
-	'pre',
-    ['LR1_The_Fellowship_of_the_Ring', 423],
-    ['LR2_The_Two_Towers', 352],
-    ['LR3_The_Return_of_the_King', 416]
+# Llibres de la saga del Senyor dels Anells
+lr_list = [
+    ['LR1_The_Fellowship_of_the_Ring', 420],
+    ['LR2_The_Two_Towers', 350],
+    ['LR3_The_Return_of_the_King', 415]
 ]
+lr_books = [Book(name, pages) for name, pages in lr_list]
+lr_graph = nx.DiGraph()
+lr_graph.add_nodes_from(lr_books)
+for i in range(len(lr_books) - 1):
+	lr_graph.add_edge(lr_books[i], lr_books[i+1], name='predecessor')
 
-hg_books = [
-	'pre',
-    ['HG1_The_Hunger_Games', 374],
-    ['HG2_Catching_Fire', 391],
+# Llibres de la saga dels Jocs de la Fam
+hg_list = [
+    ['HG1_The_Hunger_Games', 370],
+    ['HG2_Catching_Fire', 390],
     ['HG3_Mockingjay', 390]
 ]
+hg_books = [Book(name, pages) for name, pages in hg_list]
+hg_graph = nx.DiGraph()
+hg_graph.add_nodes_from(hg_books)
+for i in range(len(hg_books) - 1):
+	hg_graph.add_edge(hg_books[i], hg_books[i+1], name='predecessor')
 
+# Més preguntes a l'usuari
 while True:
 	try:
 		books_list = input("Introdueix les paraules clau de les sagues famoses de llibres separades per comes. Deixa-ho en blanc (buit) si no en vols incloure cap. [HELP per més detalls]:\n").replace(' ', '').split(',')
@@ -50,14 +93,14 @@ while True:
 			continue
 		else:
 			if 'HP' in books_list:
-				for test_books in books:
-					test_books.append(hp_books)
+				for test_graph in graphs:
+					test_graph = nx.compose(test_graph, hp_graph)
 			if 'LR' in books_list:
-				for test_books in books:
-					test_books.append(lr_books)
+				for test_graph in graphs:
+					test_graph = nx.compose(test_graph, lr_graph)
 			if 'HG' in books_list:
-				for test_books in books:
-					test_books.append(hg_books)
+				for test_graph in graphs:
+					test_graph = nx.compose(test_graph, hg_graph)
 	except ValueError:
 		print("Error: Els valors no són vàlids.")
 		continue
@@ -65,49 +108,50 @@ while True:
 
 while True:
 	try:
-		addi_books = int(input("Introdueix el nombre màxim de llibres addicionals que vols generar per cada joc de proves: "))
+		addi_books = int(input("Introdueix el nombre màxim de llibres addicionals que vols generar per cada joc de proves: ").replace(' ', ''))
 		if addi_books < 0:
 			raise ValueError
 		else:
 			while True:
 				try:
-					seed = int(input("Introdueix la llavor per generar aleatòriament diferents nombres de llibres addicionals per cada joc de proves [0 per triar una llavor qualsevol]: "))
+					seed = int(input("Introdueix la llavor per generar aleatòriament diferents nombres de llibres addicionals per cada joc de proves [0 per triar una llavor qualsevol]: ").replace(' ', ''))
 					if seed == 0:
 						seed = None
-					rng = random.Random(seed)
+						np.random.seed(seed)
 				except ValueError:
 					print("Error: Introdueix un nombre enter.")
 					continue
 				break
-			addi_books_list = [rng.randint(0, addi_books) for _ in range(n_tests)]
+			addi_books_list = [np.random.normal(400, 125, np.random.randint(addi_books) for _ in range(n_tests)]
 	except ValueError:
 		print("Error: Introdueix un nombre enter >= 0.")
 		continue
 	break
 
-for test_list in books:
+# Generació dels grafs per cada joc de proves
+for test_graph in graphs:
 	random_predecessors = ['pre']
 	random_parallels = ['par']
 
 	for i in range(1, addi_books + 1):
 		if rng.choice([True, False]):
 			random_predecessors.append(f'book_pre_{i}')
-		else:
+		if rng.choice([True, False]):
 			random_parallels.append(f'book_par_{i}')
 		
 	if len(random_predecessors) > 1:
 		if len(random_predecessors) == 2:
 			random_predecessors[0] = 'single'
-		test_list.append(random_predecessors)
+		test_graph.append(random_predecessors)
 	
 	if len(random_parallels) > 1:
 		if len(random_parallels) == 2:
 			random_parallels[0] = 'single'
-		test_list.append(random_parallels)
+		test_graph.append(random_parallels)
 
-for t, test_list in enumerate(books):
+for t, test_graph in enumerate(books):
 	print(f"\n---------- JOC DE PROVES [{t+1}] ----------")
-	for group_books in test_list:
+	for group_books in test_graph:
 		print(group_books)
 	
 
