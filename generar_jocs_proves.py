@@ -108,8 +108,8 @@ while True:
 
 while True:
 	try:
-		addi_books = int(input("Introdueix el nombre màxim de llibres addicionals que vols generar per cada joc de proves: ").replace(' ', ''))
-		if addi_books < 0:
+		max_addi_books = int(input("Introdueix el nombre màxim de llibres addicionals que vols generar per cada joc de proves: ").replace(' ', ''))
+		if max_addi_books < 0:
 			raise ValueError
 		else:
 			while True:
@@ -122,34 +122,35 @@ while True:
 					print("Error: Introdueix un nombre enter.")
 					continue
 				break
-			addi_books_list = [np.random.normal(400, 125, np.random.randint(addi_books) for _ in range(n_tests)]
+			num_addi_books_list: list[int] = [np.random.randint(0, max_addi_books + 1) for _ in range(n_tests)]
 	except ValueError:
 		print("Error: Introdueix un nombre enter >= 0.")
 		continue
 	break
 
 # Generació dels grafs per cada joc de proves
-for test_graph in graphs:
-	random_predecessors = ['pre']
-	random_parallels = ['par']
-
-	for i in range(1, addi_books + 1):
-		if rng.choice([True, False]):
-			random_predecessors.append(f'book_pre_{i}')
-		if rng.choice([True, False]):
-			random_parallels.append(f'book_par_{i}')
-		
-	if len(random_predecessors) > 1:
-		if len(random_predecessors) == 2:
-			random_predecessors[0] = 'single'
-		test_graph.append(random_predecessors)
+for i, test_graph in enumerate(graphs):
+	num_addi_books: int = num_addi_books_list[i]
 	
-	if len(random_parallels) > 1:
-		if len(random_parallels) == 2:
-			random_parallels[0] = 'single'
-		test_graph.append(random_parallels)
+	for b in range(num_addi_books):
+		while True:
+			tmp_pages: int = int(np.random.normal(400, 100))
+			if 10 <= tmp_pages <= 800:
+				break
 
-for t, test_graph in enumerate(books):
+		test_graph.add_node(Book(f'Book_{b+1}', tmp_pages))
+
+		if level == 0:
+			
+		elif level == 1:
+		
+		elif level == 2:
+			
+		elif level == 3:
+			test_graph.add_edge(np.random.choice(list(test_graph.nodes)), list(test_graph.nodes)[-1], name=np.random.choice(['predecessor', 'parallel']))
+
+# Mostra els grafs de cada joc de proves
+for t, test_graph in enumerate(graphs):
 	print(f"\n---------- JOC DE PROVES [{t+1}] ----------")
 	for group_books in test_graph:
 		print(group_books)
