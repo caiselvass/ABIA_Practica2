@@ -4,7 +4,6 @@ import networkx as nx
 from typing import Union
 import matplotlib.pyplot as plt
 
-
 # Definició de classe Book
 class Book:
 	def __init__(self, name: str, pages: int):
@@ -212,13 +211,12 @@ for i, test_graph in enumerate(graphs):
 
 # Mostra els grafs de cada joc de proves
 for i, test_graph in enumerate(graphs):
-	print(f"\n---------- JOC DE PROVES [{i+1}] ----------")
-	print(f"    * NODES[{len(test_graph.nodes)}]: {list(test_graph.nodes)}\n")
-	print(f"    * ARESTES 'PREDECESSOR'[{len(list(e for e in test_graph.edges if test_graph.edges[e]['name'] == 'predecessor'))}]: {list(f'({e[0]} -> {e[1]})' for e in test_graph.edges if test_graph.edges[e]['name'] == 'predecessor')}\n")
-	print(f"    * ARESTES 'PARALLEL[{len(list(e for e in test_graph.edges if test_graph.edges[e]['name'] == 'parallel'))}]': {list(f'({e[0]} -> {e[1]})' for e in test_graph.edges if test_graph.edges[e]['name'] == 'parallel')}\n")
+	print(f"\n---------- JOC DE PROVES [{i+1}] ----------\n")
+	print(f"    * {len(test_graph.nodes)} NODES: {list(test_graph.nodes)}\n")
+	print(f"    * {len(list(e for e in test_graph.edges if test_graph.edges[e]['name'] == 'predecessor'))} ARESTES 'PREDECESSOR': {list(f'({e[0]} -> {e[1]})' for e in test_graph.edges if test_graph.edges[e]['name'] == 'predecessor')}\n")
+	print(f"    * {len(list(e for e in test_graph.edges if test_graph.edges[e]['name'] == 'parallel'))} ARESTES 'PARALLEL': {list(f'({e[0]} -> {e[1]})' for e in test_graph.edges if test_graph.edges[e]['name'] == 'parallel')}\n")
 
 	edge_colors = ['lightblue' if test_graph.edges[e]['name'] == 'predecessor' else 'red' for e in test_graph.edges]
-	print(edge_colors)
 	nx.draw(test_graph, with_labels=True, node_color='lightgray', edge_color=edge_colors, node_size=250, arrowstyle='->', arrowsize=35, font_size=6)
 	plt.show()
 
