@@ -6,9 +6,11 @@ import matplotlib.pyplot as plt
 
 # Definició de classe Book
 class Book:
-	def __init__(self, name: str, pages: int):
+	def __init__(self, name: str, pages: int, goal: bool = False, read: bool = False):
 		self.name: str = name
 		self.pages: int = pages
+		self.goal: bool = goal
+		self.read: bool = read
 
 	def __repr__(self) -> str:
 		return f'{self.name}[{self.pages}]'
@@ -221,15 +223,108 @@ for i, test_graph in enumerate(graphs):
 	plt.show()
 
 
-"""# Generació dels jocs de proves
+# Generació dels jocs de proves
 for i in range(n_tests):
-	with open(f'problem{i}.pddl', 'w') as file:
+	with open(f'./problems/problem{i}.pddl', 'w') as file:
 		# HEADER
 		file.write(f'(define (problem reading_plan_problem_{i})\n\t(:domain reading_plan)\n')
 
 		# OBJECTS
-		books_str = ' '.join(books)
+		books_str = ' '.join(list(str(n) for n in graphs[i].nodes))
 		months = 'Past January February March April May June July August September October November December'
+		file.write(f'\t;;Objects\n\t(:objects\n\t\t{months} - months\n\t\t{books_str} - books)\n\t)\n')
 
-		file.write(f'\t;;Objects\n(:objects\n{months} - months\n{books_str} - books)\n')"""
+		# INIT
+		file.write('\t;;Init\n\t(:init\n')
+		
+		# ordre dels mesos aqui
 
+		# Initial number of months
+		file.write('\t\t;;Initial number of months\n')
+		file.write('\t\t(= (num_months_created) 1)\n')
+
+		# Start on month 1
+		file.write('\t\t;;Start on month 1\n')
+		file.write('\t\t(current_month January)\n')
+		file.write('\t\t(previous_month Past)\n')
+
+		# Predecessors
+		file.write('\t\t;;Predecessos\n')
+		for e in graphs[i].edges:
+			if graphs[i].edges[e]['name'] == 'predecessor':
+				file.write(f'\t\t(predecessor {e[0]} {e[1]})\n')
+		
+		# Parallels
+		file.write('\t\t;;Parallels\n')
+		for e in graphs[i].edges:
+			if graphs[i].edges[e]['name'] == 'parallel':
+				file.write(f'\t\t(parallel {e[0]} {e[1]})\n')
+
+		# llibres goal aqui
+
+		# llibres llegits aqui
+
+		# Book pages
+		file.write('\t\t;;Book pages\n')
+		for n in graphs[i].nodes:
+			file.write(f'\t\t(= (total_pages {n}) {n.pages})\n')
+
+		# Initial pages read per month
+		file.write('\t\t;;Initial pages read per month\n')
+		for m in months.split():
+			file.write(f'\t\t(= (pages_read {m}) 0)\n')
+
+		file.write('\t)\n')
+
+		# GOAL
+		file.write('\t;;Goal\n\t(:goal\n')
+		file.write('\t\t(and\n')
+		file.write('\t\t\t(forall (?b - book) (imply (goal_book ?b) (read ?b)))\n\t\t)\n\t)\n')
+
+		# METRICS
+		file.write('\t;;Optimize the number of months\n\t(:metric minimize (num_months_created))\n')
+
+		# FOOTER
+		file.write(')')
+
+# Pregunta a l'usuari si vol executar el planner
+while True:
+	try:
+		execute_planner: Union[bool, str] = input("Vols executar el planner per tots els jocs de prova generats? [Y/N]: ").replace(' ', '')
+		if execute_planner not in {'Y', 'y', 'N', 'n'}:
+			raise ValueError
+		else:
+			if execute_planner in {'S', 's'}:
+				execute_planner = True
+			else:
+				execute_planner = False
+	except ValueError:
+		print("Error: Introdueix només un dels següents valors: Y, N.")
+		continue
+	break
+
+if execute_planner:
+	import os
+
+	# Optimitzar el nombre de mesos
+	while True:
+		try:
+			optimize_months: Union[bool, str] = input("Vols aplicar l'optimitzador de nombre de mesos? [Y/N]: ").replace(' ', '')
+			if optimize_months not in {'Y', 'y', 'N', 'n'}:
+				raise ValueError
+			else:
+				if optimize_months in {'S', 's'}:
+					optimize_months = True
+				else:
+					optimize_months = False
+		except ValueError:
+			print("Error: Introdueix només un dels següents valors: Y, N.")
+			continue
+		break
+
+	# Execució del planner
+	for i in range(n_tests):
+		if optimize_months:
+			os.system(f'./metricff -O -o ./domains/domain.pddl -f ./problems/problem{i}.pddl > ../results/opt_reading_plan{i}.txt')
+		else:
+			os.system(f'./metricff -o ./domains/domain.pddl -f ./problems/problem{i}.pddl > ../results/reading_plan_{i}.txt')

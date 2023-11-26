@@ -69,7 +69,7 @@
         (= (num_months_created) 1)
 
         ;; Start on month 1
-        (actual_month January)
+        (current_month January)
 
         ;; Give an initial previous month (just for simplifying the code)
         (previous_month Past)

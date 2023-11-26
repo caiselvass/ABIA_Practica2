@@ -14,7 +14,7 @@
         (goal_book ?b - book) ; New predicate for goal books
         (assigned ?b - book ?m - month)
         (month_finished ?m - month)
-        (actual_month ?m - month)
+        (current_month ?m - month)
         (next_month ?m1 - month ?m2 - month)
         (previous_month ?m - month)
     )
@@ -32,7 +32,7 @@
         :precondition (and
             (not (read ?b))
             (or (goal_book ?b) (exists (?x - book) (predecessor ?b ?x)))
-            (actual_month ?actualm)
+            (current_month ?actualm)
             (previous_month ?prevm)
             ;; The predecessors must have been read before the book's month
             (forall (?pre - book) (imply (predecessor ?pre ?b) (and (read ?pre) (not (assigned ?pre ?actualm)))))
@@ -53,14 +53,14 @@
     (:action start_month
         :parameters (?nextm - month ?actualm - month ?prevm - month)
         :precondition (and 
-            (actual_month ?actualm)
+            (current_month ?actualm)
             (previous_month ?prevm)
             (next_month ?actualm ?nextm)
         )
         :effect (and
             (month_finished ?actualm)
-            (not (actual_month ?actualm))
-            (actual_month ?nextm)
+            (not (current_month ?actualm))
+            (current_month ?nextm)
             (previous_month ?actualm)
             (not (previous_month ?prevm))
             (increase (num_months_created) 1) 
