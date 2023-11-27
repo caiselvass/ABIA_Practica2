@@ -45,10 +45,10 @@ def add_edge_if_no_cycle(graph: nx.DiGraph, u: Book, v: Book, edge_name: str) ->
 	Afegeix l'aresta (u, v) al graf si no crea un cicle.
 	"""
 	if has_cycle(graph, u, v):
-		print(f"    * L'aresta ({u} -> {v}) crearia un cicle. No s'ha afegit.")
+		print(f"\t* L'aresta ({u} -> {v}) crearia un cicle. No s'ha afegit.")
 	else:
 		graph.add_edge(u, v, name=edge_name)
-		print(f"    * Aresta ({u} -> {v}) afegida correctament.")
+		print(f"\t* Aresta ({u} -> {v}) afegida correctament.")
 
 
 # Nivell d'extensió dels jocs de proves
@@ -129,7 +129,7 @@ while True:
 			if string not in {'HP', 'LR', 'HG', 'HELP', 'help', ''}:
 				raise ValueError
 		if len(books_list) == 1 and books_list[0] in {'HELP', 'help'}:
-			print(f"Pots escriure les següents paraules clau per incloure sagues famoses de llibres:\n    1) HP per incloure tots els 7 llibres de Harry Potter.\n    2) LR per incloure tots els 3 llibres del Senyor dels Anells (The Lord of the Rings).\n    3) HG per incloure tots els 3 llibres de la saga dels Jocs de la Fam (Hunger Games).")
+			print(f"Pots escriure les següents paraules clau per incloure sagues famoses de llibres:\n\t* HP per incloure tots els 7 llibres de Harry Potter.\n\t* LR per incloure tots els 3 llibres del Senyor dels Anells (The Lord of the Rings).\n\t* HG per incloure tots els 3 llibres de la saga dels Jocs de la Fam (Hunger Games).")
 			continue
 		else:
 			if 'HP' in books_list:
@@ -214,9 +214,9 @@ for i, test_graph in enumerate(graphs):
 # Mostra els grafs de cada joc de proves
 for i, test_graph in enumerate(graphs):
 	print(f"\n---------- JOC DE PROVES [{i+1}] ----------\n")
-	print(f"    * {len(test_graph.nodes)} NODES: {list(test_graph.nodes)}\n")
-	print(f"    * {len(list(e for e in test_graph.edges if test_graph.edges[e]['name'] == 'predecessor'))} ARESTES 'PREDECESSOR': {list(f'({e[0]} -> {e[1]})' for e in test_graph.edges if test_graph.edges[e]['name'] == 'predecessor')}\n")
-	print(f"    * {len(list(e for e in test_graph.edges if test_graph.edges[e]['name'] == 'parallel'))} ARESTES 'PARALLEL': {list(f'({e[0]} -> {e[1]})' for e in test_graph.edges if test_graph.edges[e]['name'] == 'parallel')}\n")
+	print(f"\t* {len(test_graph.nodes)} NODES: {list(test_graph.nodes)}\n")
+	print(f"\t* {len(list(e for e in test_graph.edges if test_graph.edges[e]['name'] == 'predecessor'))} ARESTES 'PREDECESSOR': {list(f'({e[0]} -> {e[1]})' for e in test_graph.edges if test_graph.edges[e]['name'] == 'predecessor')}\n")
+	print(f"\t* {len(list(e for e in test_graph.edges if test_graph.edges[e]['name'] == 'parallel'))} ARESTES 'PARALLEL': {list(f'({e[0]} -> {e[1]})' for e in test_graph.edges if test_graph.edges[e]['name'] == 'parallel')}\n")
 
 	edge_colors = ['lightblue' if test_graph.edges[e]['name'] == 'predecessor' else 'red' for e in test_graph.edges]
 	nx.draw(test_graph, with_labels=True, node_color='lightgray', edge_color=edge_colors, node_size=250, arrowstyle='->', arrowsize=35, font_size=6)
@@ -274,8 +274,8 @@ for i in range(n_tests):
 		file.write('\t\t;;Books the user has already read\n')
 		for b in np.random.choice(list(graphs[i].nodes), size=np.random.randint(1, len(list(graphs[i].nodes)) + 1), replace=False):
 			file.write(f'\t\t(read {b})\n')
-			file.write(f'\t\t(goal_book {b})')
-			file.write(f'\t\t(assigned {b} Past)\n)')
+			file.write(f'\t\t(goal_book {b})\n')
+			file.write(f'\t\t(assigned {b} Past)\n')
 
 		# Book pages
 		file.write('\t\t;;Book pages\n')
@@ -286,8 +286,6 @@ for i in range(n_tests):
 		file.write('\t\t;;Initial pages read per month\n')
 		for m in months.split():
 			file.write(f'\t\t(= (pages_read {m}) 0)\n')
-
-		file.write('\t)\n')
 
 		# GOAL
 		file.write('\t;;Goal\n\t(:goal\n')
@@ -308,7 +306,7 @@ while True:
 			raise ValueError
 		else:
 			if execute_planner in {'HELP', 'help'}:
-				print("")			
+				print("L'execució automàtica es realitzarà amb els programes proporcionats per realitzar la pràcitca:\n\t* Windows: metricff\n\t* Linux: metricff\n\t* MacOS: ff\n\nSi voleu executar el planner manualment, executeu el següent comandament:\n\t* Windows: metricff -o ./domains/domain.pddl -f ./problems/problem_X.pddl\n\t* Linux: metricff -o ./domains/domain.pddl -f ./problems/problem_X.pddl\n\t* MacOS: ff -o ./domains/domain.pddl -f ./problems/problem_X.pddl\n\n\tOn X és el número del joc de proves que voleu executar. Els resultats de l'execució es guardaran a la carpeta 'results'.")			
 				continue
 			elif execute_planner in {'S', 's'}:
 				execute_planner = True
@@ -337,7 +335,7 @@ if execute_planner:
 		break
 
 	# Execució del planner
-	import platform #Per saber si estem a Windows, Linux o macOS
+	import platform #Per saber si estem a Windows, Linux o MacOS
 	import subprocess # Per executar el planner
 
 	operative_system = platform.system()
@@ -373,7 +371,7 @@ if execute_planner:
 				with open(f'./results/reading_plan_{i+1}.txt', 'w') as result_file:
 					result_file.write(execution.stdout.decode('utf-8'))
 	
-	# macOS
+	# MacOS
 	elif operative_system == 'Darwin':
 		for i in range(n_tests):
 			if optimize_months:
