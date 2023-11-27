@@ -1,5 +1,5 @@
 (define (domain reading_plan)
-    (:requirements :strips :typing :equality :fluents :conditional-effects)
+    (:requirements :strips :typing :fluents)
 
     ;; Types
     (:types
@@ -31,13 +31,13 @@
         :parameters (?b - book ?actualm - month ?prevm - month)
         :precondition (and
             (not (read ?b))
-            (or (goal_book ?b) (exists (?x - book) (predecessor ?b ?x)))
+            (or (goal_book ?b) (exists (?x - book) (predecessor ?b ?x)) (exists (?y - book) (parallel ?y ?b)))
             (current_month ?actualm)
             (previous_month ?prevm)
-            ;; The predecessors must have been recmk l nhlu fly cl v7 vblfc vy cfyf  yfl xtrd lc yfl d cclcad before the book's month
+            ;; The predecessors must have been read before the book's month
             (forall (?pre - book) (imply (predecessor ?pre ?b) (and (read ?pre) (not (assigned ?pre ?actualm)))))
             ;; The parallel books must be a goal to be read before the book's month or in the same month
-            (forall (?par - book) (imply (and (parallel ?b ?par) (goal_book ?par)) (or (assigned ?par ?actualm) (assigned ?par ?prevm))))
+            (forall (?par - book) (imply (parallel ?b ?par) (or (assigned ?par ?actualm) (assigned ?par ?prevm))))
 
             (<= (+ (pages_read ?actualm) (total_pages ?b)) 800)
         )

@@ -353,29 +353,18 @@ if execute_planner:
 	if operative_system == 'Windows':
 		for i in range(n_tests):
 			if optimize_months:
-				execution = subprocess.run([f'./executables/windows/metricff -O -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-				# Guarda els resultats de l'execució del planner
 				with open(f'./results/opt_reading_plan_{i+1}.txt', 'w') as result_file:
-					result_file.write(execution.stdout.decode('utf-8'))
+					execution = subprocess.run(['powershell', f'./executables/windows/metricff -O -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=result_file)
 			else:
-				execution = subprocess.run([f'./executables/windows/metricff -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-				print(execution.stdout)
-				print('----------DECODED----------')
-				print(execution.stdout.decode('utf-8'))
-				# Guarda els resultats de l'execució del planner
-				with open(f'./results/results_{i+1}.txt', 'w') as result_file:
-					result_file.write(execution.stdout.decode('utf-8'))
+				with open(f'./results/reading_plan_{i+1}.txt', 'w') as result_file:
+					execution = subprocess.run(['powershell', f'./executables/windows/metricff -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=result_file)
 	
 	# MacOS
 	elif operative_system == 'Darwin':
 		for i in range(n_tests):
 			if optimize_months:
-				execution = subprocess.run([f'./executables/macos/ff -O -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-				# Guarda els resultats de l'execució del planner
 				with open(f'./results/opt_reading_plan_{i+1}.txt', 'w') as result_file:
-					result_file.write(execution.stdout.decode('utf-8'))
+					execution = subprocess.run([f'./executables/macos/ff -O -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=result_file)
 			else:
-				execution = subprocess.run([f'./executables/macos/ff -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-				# Guarda els resultats de l'execució del planner
-				with open(f'./results/reading_plan_ext_{level}_{i+1}.txt', 'w') as result_file:
-					result_file.write(execution.stdout.decode('utf-8'))
+				with open(f'./results/reading_plan_{i+1}.txt', 'w') as result_file:
+					execution = subprocess.run([f'./executables/macos/ff -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=result_file)
