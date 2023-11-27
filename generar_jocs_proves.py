@@ -309,7 +309,7 @@ while True:
 			raise ValueError
 		else:
 			if execute_planner in {'HELP', 'help'}:
-				print("L'execució automàtica es realitzarà amb els programes proporcionats per realitzar la pràcitca:\n\t* Windows: metricff\n\t* Linux: metricff\n\t* MacOS: ff\n\nSi voleu executar el planner manualment, executeu el següent comandament:\n\t* Windows: metricff -o ./domains/domain.pddl -f ./problems/problem_X.pddl\n\t* Linux: metricff -o ./domains/domain.pddl -f ./problems/problem_X.pddl\n\t* MacOS: ff -o ./domains/domain.pddl -f ./problems/problem_X.pddl\n\n\tOn X és el número del joc de proves que voleu executar. Els resultats de l'execució es guardaran a la carpeta 'results'.")			
+				print("L'execució automàtica només està disponible per Sistemes Operatius Windows o MacOS. Es realitzarà amb els següents programes proporcionats per realitzar la pràcitca:\n\t* Windows: metricff.\n\t* MacOS: ff.\n\nSi voleu executar el planner manualment, executeu la següent comanda:\n\t* Windows: ./executables/windows/metricff -o ./domains/default_domain_ext_X.pddl -f ./problems/generated_problem_ext_X_Y.pddl\n\t* MacOS: ./executables/macos/ff -o ./domains/default_domain_ext_X.pddl -f ./problems/default_problem_ext_X_Y.pddl\n\n\tOn X és el nivell d'extensió del joc de proves que voleu executar i Y és el número del joc de proves que voleu executar. Els resultats de l'execució es guardaran a la carpeta 'results'.")			
 				continue
 			elif execute_planner in {'Y', 'y'}:
 				execute_planner = True
@@ -346,8 +346,8 @@ if execute_planner:
 
 	operative_system = platform.system()
 
-	if operative_system not in {'Windows', 'Linux', 'Darwin'}:
-		raise RuntimeError("El programa no ha pogut detectar quin és el vostre sistema operatiu. Siusplau, executeu el planner manualment.")
+	if operative_system not in {'Windows', 'Darwin'}:
+		raise RuntimeError("El programa no ha pogut verificar que el vostre sistema operatiu sigui Windows o MacOS. Siusplau, executeu el planner manualment.")
 
 	# Windows
 	if operative_system == 'Windows':
@@ -362,20 +362,6 @@ if execute_planner:
 				print(execution.stdout)
 				# Guarda els resultats de l'execució del planner
 				with open(f'./results/results_{i+1}.txt', 'w') as result_file:
-					result_file.write(execution.stdout.decode('utf-8'))
-	
-	# Linux
-	elif operative_system == 'Linux':
-		for i in range(n_tests):
-			if optimize_months:
-				execution = subprocess.run([f'./executables/linux/metricff -O -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-				# Guarda els resultats de l'execució del planner
-				with open(f'./results/opt_reading_plan_{i+1}.txt', 'w') as result_file:
-					result_file.write(execution.stdout.decode('utf-8'))
-			else:
-				execution = subprocess.run([f'./executables/linux/metricff -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-				# Guarda els resultats de l'execució del planner
-				with open(f'./results/reading_plan_{i+1}.txt', 'w') as result_file:
 					result_file.write(execution.stdout.decode('utf-8'))
 	
 	# MacOS
