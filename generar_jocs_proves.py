@@ -230,7 +230,7 @@ for i in range(n_tests):
 		# OBJECTS
 		books_str = ' '.join(list(str(n) for n in graphs[i].nodes))
 		months = 'Past January February March April May June July August September October November December'
-		file.write(f'\t;;Objects\n\t(:objects\n\t\t{months} - months\n\t\t{books_str} - books\n\t)\n')
+		file.write(f'\t;;Objects\n\t(:objects\n\t\t{months} - month\n\t\t{books_str} - book\n\t)\n')
 
 		# INIT
 		file.write('\t;;Init\n\t(:init\n')
@@ -360,6 +360,8 @@ if execute_planner:
 			else:
 				execution = subprocess.run([f'./executables/windows/metricff -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 				print(execution.stdout)
+				print('----------DECODED----------')
+				print(execution.stdout.decode('utf-8'))
 				# Guarda els resultats de l'execució del planner
 				with open(f'./results/results_{i+1}.txt', 'w') as result_file:
 					result_file.write(execution.stdout.decode('utf-8'))
