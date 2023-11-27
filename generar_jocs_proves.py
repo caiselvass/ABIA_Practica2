@@ -194,10 +194,18 @@ for i, test_graph in enumerate(graphs):
 						break
 				add_edge_if_no_cycle(test_graph, tmp_pred, b, edge_name='predecessor')
 		
-	# elif level == 1:
-	# 	#Extensión 1: Los libros pueden tener de 0 a N predecesores pero ningún paralelo. El planner
-	# 	# es capaz de construir un plan para poder llegar a leer los libros objetivo, donde para todo
-	# 	# libro que pertenece al plan, todos sus libros predecesores pertenecen al plan y están en meses anteriores.
+	elif level == 1:
+		#Extensión 1: Los libros pueden tener de 0 a N predecesores pero ningún paralelo. El planner
+		# es capaz de construir un plan para poder llegar a leer los libros objetivo, donde para todo
+		# libro que pertenece al plan, todos sus libros predecesores pertenecen al plan y están en meses anteriores.
+		for b in tmp_addi_books:
+			for _ in range(np.random.randint(0, len(tmp_addi_books))):
+				while True:
+					tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
+					if tmp_pred != b:
+						break
+				add_edge_if_no_cycle(test_graph, tmp_pred, b, edge_name='predecessor')
+
 	# elif level == 2:
 	# 	#Extensión 2: Extensión 1 + los libros pueden tener de 0 a M libros paralelos. El planner es
 	# 	# capaz de construir un plan para poder llegar a leer los libros objetivo, donde para todo libro
@@ -211,7 +219,7 @@ for i, test_graph in enumerate(graphs):
 
 # Mostra els grafs de cada joc de proves
 for i, test_graph in enumerate(graphs):
-	print(f"\n\n**********[ JOC DE PROVES {i+1} ]**********\n")
+	print(f"\n\n********** JOC DE PROVES {i+1} **********\n")
 	print(f"\t* {len(test_graph.nodes)} NODES: {list(test_graph.nodes)}\n")
 	print(f"\t* {len(list(e for e in test_graph.edges if test_graph.edges[e]['name'] == 'predecessor'))} ARESTES 'PREDECESSOR': {list(f'({e[0]} -> {e[1]})' for e in test_graph.edges if test_graph.edges[e]['name'] == 'predecessor')}\n")
 	print(f"\t* {len(list(e for e in test_graph.edges if test_graph.edges[e]['name'] == 'parallel'))} ARESTES 'PARALLEL': {list(f'({e[0]} -> {e[1]})' for e in test_graph.edges if test_graph.edges[e]['name'] == 'parallel')}\n")
