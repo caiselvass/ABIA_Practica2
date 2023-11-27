@@ -124,7 +124,7 @@ for i in range(len(hg_books) - 1):
 # Més preguntes a l'usuari
 while True:
 	try:
-		books_list: list[str] = input("Introdueix les paraules clau de les sagues famoses de llibres separades per comes. Deixa-ho en blanc (buit) si no en vols incloure cap. [HP/LR/HG/HELP]:\n").replace(' ', '').split(',')
+		books_list: list[str] = input("Introdueix les paraules clau de les sagues famoses de llibres separades per comes. Deixa-ho en blanc (buit) si no en vols incloure cap. (HELP per més informació) [HP/LR/HG/HELP]:\n").replace(' ', '').split(',')
 		for string in books_list:
 			if string not in {'HP', 'LR', 'HG', 'HELP', 'help', ''}:
 				raise ValueError
@@ -142,7 +142,7 @@ while True:
 				for i, test_graph in enumerate(graphs):
 					graphs[i] = nx.union(test_graph, hg_graph)
 	except ValueError:
-		print("Error: Els valors no són vàlids.")
+		print("Error: Els valors no són vàlids. Introdueix només un els següents valors: HP, LR, HG, HELP.")
 		continue
 	break
 
@@ -225,7 +225,7 @@ for i, test_graph in enumerate(graphs):
 
 # Generació dels jocs de proves
 for i in range(n_tests):
-	with open(f'./problems/problem_{i+1}.pddl', 'w') as file:
+	with open(f'./problems/generated_problem_ext_{level}_{i+1}.pddl', 'w') as file:
 		# HEADER
 		file.write(f'(define (problem reading_plan_problem_{i+1})\n\t(:domain reading_plan)\n')
 
@@ -267,12 +267,15 @@ for i in range(n_tests):
 
 		# Goal books
 		file.write('\t\t;;Books the user would like to read\n')
-		for b in np.random.choice(list(graphs[i].nodes), size=np.random.randint(1, len(list(graphs[i].nodes)) + 1), replace=False):
+		goal_books:set = set(np.random.choice(list(graphs[i].nodes), size=np.random.randint(1, len(list(graphs[i].nodes)) + 1), replace=False))
+		for b in goal_books:
 			file.write(f'\t\t(goal_book {b})\n')
 
 		# Read books
+		remaining_books: set = set(graphs[i].nodes) - goal_books
+		num_remaining_books: int = len(remaining_books)
 		file.write('\t\t;;Books the user has already read\n')
-		for b in np.random.choice(list(graphs[i].nodes), size=np.random.randint(1, len(list(graphs[i].nodes)) + 1), replace=False):
+		for b in set(np.random.choice(list(remaining_books), size=np.random.randint(min(1, num_remaining_books), num_remaining_books + 1), replace=False)):
 			file.write(f'\t\t(read {b})\n')
 			file.write(f'\t\t(goal_book {b})\n')
 			file.write(f'\t\t(assigned {b} Past)\n')
@@ -308,12 +311,12 @@ while True:
 			if execute_planner in {'HELP', 'help'}:
 				print("L'execució automàtica es realitzarà amb els programes proporcionats per realitzar la pràcitca:\n\t* Windows: metricff\n\t* Linux: metricff\n\t* MacOS: ff\n\nSi voleu executar el planner manualment, executeu el següent comandament:\n\t* Windows: metricff -o ./domains/domain.pddl -f ./problems/problem_X.pddl\n\t* Linux: metricff -o ./domains/domain.pddl -f ./problems/problem_X.pddl\n\t* MacOS: ff -o ./domains/domain.pddl -f ./problems/problem_X.pddl\n\n\tOn X és el número del joc de proves que voleu executar. Els resultats de l'execució es guardaran a la carpeta 'results'.")			
 				continue
-			elif execute_planner in {'S', 's'}:
+			elif execute_planner in {'Y', 'y'}:
 				execute_planner = True
 			else:
 				execute_planner = False
 	except ValueError:
-		print("Error: Introdueix només un dels següents valors: Y, N.")
+		print("Error: Introdueix només un dels següents valors: Y, N, HELP.")
 		continue
 	break
 
@@ -321,16 +324,19 @@ if execute_planner:
 	# Optimitzar el nombre de mesos
 	while True:
 		try:
-			optimize_months: Union[bool, str] = input("Vols aplicar l'optimitzador de nombre de mesos? [Y/N]: ").replace(' ', '')
-			if optimize_months not in {'Y', 'y', 'N', 'n'}:
+			optimize_months: Union[bool, str] = input("Vols aplicar l'optimitzador de nombre de mesos? (HELP per més informació) [Y/N/HELP]: ").replace(' ', '')
+			if optimize_months not in {'Y', 'y', 'N', 'n', 'HELP', 'help'}:
 				raise ValueError
 			else:
-				if optimize_months in {'S', 's'}:
+				if optimize_months in {'HELP', 'help'}:
+					print("L'optimitzador de nombre de mesos afegeix el flag '-O' a l'execució. D'aquesta manera es garantitza que el nombre de mesos que es generen en el plan sigui el mínim possible, però el cost computacional és considerablement més alt.")
+					continue
+				elif optimize_months in {'Y', 'y'}:
 					optimize_months = True
 				else:
 					optimize_months = False
 		except ValueError:
-			print("Error: Introdueix només un dels següents valors: Y, N.")
+			print("Error: Introdueix només un dels següents valors: Y, N, HELP.")
 			continue
 		break
 
@@ -347,12 +353,12 @@ if execute_planner:
 	if operative_system == 'Windows':
 		for i in range(n_tests):
 			if optimize_months:
-				execution = subprocess.run([f'./metricff -O -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				execution = subprocess.run([f'./metricff -O -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 				# Guarda els resultats de l'execució del planner
 				with open(f'./results/opt_reading_plan_{i+1}.txt', 'w') as result_file:
 					result_file.write(execution.stdout.decode('utf-8'))
 			else:
-				execution = subprocess.run([f'./metricff -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				execution = subprocess.run([f'./metricff -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 				# Guarda els resultats de l'execució del planner
 				with open(f'./results/results_{i+1}.txt', 'w') as result_file:
 					result_file.write(execution.stdout.decode('utf-8'))
@@ -361,12 +367,12 @@ if execute_planner:
 	elif operative_system == 'Linux':
 		for i in range(n_tests):
 			if optimize_months:
-				execution = subprocess.run([f'./metricff -O -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				execution = subprocess.run([f'./metricff -O -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 				# Guarda els resultats de l'execució del planner
 				with open(f'./results/opt_reading_plan_{i+1}.txt', 'w') as result_file:
 					result_file.write(execution.stdout.decode('utf-8'))
 			else:
-				execution = subprocess.run([f'./metricff -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				execution = subprocess.run([f'./metricff -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 				# Guarda els resultats de l'execució del planner
 				with open(f'./results/reading_plan_{i+1}.txt', 'w') as result_file:
 					result_file.write(execution.stdout.decode('utf-8'))
@@ -375,12 +381,12 @@ if execute_planner:
 	elif operative_system == 'Darwin':
 		for i in range(n_tests):
 			if optimize_months:
-				execution = subprocess.run([f'./ff -O -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				execution = subprocess.run([f'./ff -O -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 				# Guarda els resultats de l'execució del planner
 				with open(f'./results/opt_reading_plan_{i+1}.txt', 'w') as result_file:
 					result_file.write(execution.stdout.decode('utf-8'))
 			else:
-				execution = subprocess.run([f'./ff -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				execution = subprocess.run([f'./ff -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 				# Guarda els resultats de l'execució del planner
-				with open(f'./results/reading_plan_{i+1}.txt', 'w') as result_file:
+				with open(f'./results/reading_plan_ext_{level}_{i+1}.txt', 'w') as result_file:
 					result_file.write(execution.stdout.decode('utf-8'))
