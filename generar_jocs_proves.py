@@ -225,9 +225,9 @@ for i, test_graph in enumerate(graphs):
 
 # Generació dels jocs de proves
 for i in range(n_tests):
-	with open(f'./problems/problem{i}.pddl', 'w') as file:
+	with open(f'./problems/problem_{i+1}.pddl', 'w') as file:
 		# HEADER
-		file.write(f'(define (problem reading_plan_problem_{i})\n\t(:domain reading_plan)\n')
+		file.write(f'(define (problem reading_plan_problem_{i+1})\n\t(:domain reading_plan)\n')
 
 		# OBJECTS
 		books_str = ' '.join(list(str(n) for n in graphs[i].nodes))
@@ -324,8 +324,6 @@ while True:
 	break
 
 if execute_planner:
-	import os
-
 	# Optimitzar el nombre de mesos
 	while True:
 		try:
@@ -343,8 +341,31 @@ if execute_planner:
 		break
 
 	# Execució del planner
-	for i in range(n_tests):
-		if optimize_months:
-			os.system(f'./metricff -O -o ./domains/domain.pddl -f ./problems/problem{i}.pddl > ../results/opt_reading_plan{i}.txt')
-		else:
-			os.system(f'./metricff -o ./domains/domain.pddl -f ./problems/problem{i}.pddl > ../results/reading_plan_{i}.txt')
+	import platform #Per saber si estem a Windows, Linux o macOS
+	import subprocess # Per executar el planner
+
+	operative_system = platform.system()
+
+	if operative_system not in {'Windows', 'Linux', 'Darwin'}:
+		raise RuntimeError("El programa no ha pogut detectar quin és el vostre sistema operatiu. Siusplau, executeu el planner manualment.")
+
+	if operative_system == 'Windows':
+		for i in range(n_tests):
+			if optimize_months:
+				subprocess.run([f'./metricff -O -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			else:
+				subprocess.run([f'./metricff -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+	elif operative_system == 'Linux':
+		for i in range(n_tests):
+			if optimize_months:
+				subprocess.run([f'./metricff -O -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			else:
+				subprocess.run([f'./metricff -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+	elif operative_system == 'Darwin':
+		for i in range(n_tests):
+			if optimize_months:
+				subprocess.run([f'./metricff -O -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			else:
+				subprocess.run([f'./metricff -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
