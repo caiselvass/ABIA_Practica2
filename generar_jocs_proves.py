@@ -124,7 +124,7 @@ for i in range(len(hg_books) - 1):
 # Més preguntes a l'usuari
 while True:
 	try:
-		books_list: list[str] = input("Introdueix les paraules clau de les sagues famoses de llibres separades per comes. Deixa-ho en blanc (buit) si no en vols incloure cap. [HELP per més detalls]:\n").replace(' ', '').split(',')
+		books_list: list[str] = input("Introdueix les paraules clau de les sagues famoses de llibres separades per comes. Deixa-ho en blanc (buit) si no en vols incloure cap. [HP/LR/HG/HELP]:\n").replace(' ', '').split(',')
 		for string in books_list:
 			if string not in {'HP', 'LR', 'HG', 'HELP', 'help', ''}:
 				raise ValueError
@@ -154,7 +154,7 @@ while True:
 		else:
 			while True:
 				try:
-					seed: Union[int, None] = int(input("Introdueix la llavor per generar aleatòriament diferents nombres de llibres addicionals per cada joc de proves [0 per triar una llavor qualsevol]: ").replace(' ', ''))
+					seed: Union[int, None] = int(input("Introdueix la llavor per generar aleatòriament diferents nombres de llibres addicionals per cada joc de proves (0 per triar una llavor qualsevol): ").replace(' ', ''))
 					if seed == 0:
 						seed = None
 						np.random.seed(seed)
@@ -176,7 +176,7 @@ for i, test_graph in enumerate(graphs):
 	
 	for b in range(num_addi_books):
 		while True:
-			tmp_pages: int = int(np.random.normal(400, 100))
+			tmp_pages: int = int(np.random.normal(275, 100))
 			if 10 <= tmp_pages <= 800:
 				break
 		
@@ -239,17 +239,10 @@ for i in range(n_tests):
 		
 		# Order the months
 		file.write('\t\t;;Order the months\n')
-		file.write('\t\t(next_month January February)\n')
-		file.write('\t\t(next_month February March)\n')
-		file.write('\t\t(next_month March April)\n')
-		file.write('\t\t(next_month April May)\n')
-		file.write('\t\t(next_month May June)\n')
-		file.write('\t\t(next_month June July)\n')
-		file.write('\t\t(next_month July August)\n')
-		file.write('\t\t(next_month August September)\n')
-		file.write('\t\t(next_month September October)\n')
-		file.write('\t\t(next_month October November)\n')
-		file.write('\t\t(next_month November December)\n')
+		file.write('\t\t(next_month January February) (next_month February March) (next_month March April)\n')
+		file.write('\t\t(next_month April May) (next_month May June) (next_month June July)\n')
+		file.write('\t\t(next_month July August) (next_month August September) (next_month September October)\n')
+		file.write('\t\t(next_month October November) (next_month November December)\n')
 
 		# Initial number of months
 		file.write('\t\t;;Initial number of months\n')
@@ -310,11 +303,14 @@ for i in range(n_tests):
 # Pregunta a l'usuari si vol executar el planner
 while True:
 	try:
-		execute_planner: Union[bool, str] = input("Vols executar el planner per tots els jocs de prova generats? [Y/N]: ").replace(' ', '')
-		if execute_planner not in {'Y', 'y', 'N', 'n'}:
+		execute_planner: Union[bool, str] = input("Vols executar automàticament el planner per tots els jocs de prova generats? (HELP per més informació) [Y/N/HELP]: ").replace(' ', '')
+		if execute_planner not in {'Y', 'y', 'N', 'n', 'HELP', 'help'}:
 			raise ValueError
 		else:
-			if execute_planner in {'S', 's'}:
+			if execute_planner in {'HELP', 'help'}:
+				print("")			
+				continue
+			elif execute_planner in {'S', 's'}:
 				execute_planner = True
 			else:
 				execute_planner = False
@@ -349,23 +345,44 @@ if execute_planner:
 	if operative_system not in {'Windows', 'Linux', 'Darwin'}:
 		raise RuntimeError("El programa no ha pogut detectar quin és el vostre sistema operatiu. Siusplau, executeu el planner manualment.")
 
+	# Windows
 	if operative_system == 'Windows':
 		for i in range(n_tests):
 			if optimize_months:
-				subprocess.run([f'./metricff -O -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				execution = subprocess.run([f'./metricff -O -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				# Guarda els resultats de l'execució del planner
+				with open(f'./results/opt_reading_plan_{i+1}.txt', 'w') as result_file:
+					result_file.write(execution.stdout.decode('utf-8'))
 			else:
-				subprocess.run([f'./metricff -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
+				execution = subprocess.run([f'./metricff -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				# Guarda els resultats de l'execució del planner
+				with open(f'./results/results_{i+1}.txt', 'w') as result_file:
+					result_file.write(execution.stdout.decode('utf-8'))
+	
+	# Linux
 	elif operative_system == 'Linux':
 		for i in range(n_tests):
 			if optimize_months:
-				subprocess.run([f'./metricff -O -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				execution = subprocess.run([f'./metricff -O -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				# Guarda els resultats de l'execució del planner
+				with open(f'./results/opt_reading_plan_{i+1}.txt', 'w') as result_file:
+					result_file.write(execution.stdout.decode('utf-8'))
 			else:
-				subprocess.run([f'./metricff -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
+				execution = subprocess.run([f'./metricff -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				# Guarda els resultats de l'execució del planner
+				with open(f'./results/reading_plan_{i+1}.txt', 'w') as result_file:
+					result_file.write(execution.stdout.decode('utf-8'))
+	
+	# macOS
 	elif operative_system == 'Darwin':
 		for i in range(n_tests):
 			if optimize_months:
-				subprocess.run([f'./metricff -O -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				execution = subprocess.run([f'./ff -O -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				# Guarda els resultats de l'execució del planner
+				with open(f'./results/opt_reading_plan_{i+1}.txt', 'w') as result_file:
+					result_file.write(execution.stdout.decode('utf-8'))
 			else:
-				subprocess.run([f'./metricff -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				execution = subprocess.run([f'./ff -o ./domains/domain.pddl -f ./problems/problem_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				# Guarda els resultats de l'execució del planner
+				with open(f'./results/reading_plan_{i+1}.txt', 'w') as result_file:
+					result_file.write(execution.stdout.decode('utf-8'))
