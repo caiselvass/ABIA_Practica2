@@ -211,7 +211,7 @@ for i, test_graph in enumerate(graphs):
 
 # Mostra els grafs de cada joc de proves
 for i, test_graph in enumerate(graphs):
-	print(f"\n---------- JOC DE PROVES [{i+1}] ----------\n")
+	print(f"\n\n**********[ JOC DE PROVES {i+1} ]**********\n")
 	print(f"\t* {len(test_graph.nodes)} NODES: {list(test_graph.nodes)}\n")
 	print(f"\t* {len(list(e for e in test_graph.edges if test_graph.edges[e]['name'] == 'predecessor'))} ARESTES 'PREDECESSOR': {list(f'({e[0]} -> {e[1]})' for e in test_graph.edges if test_graph.edges[e]['name'] == 'predecessor')}\n")
 	print(f"\t* {len(list(e for e in test_graph.edges if test_graph.edges[e]['name'] == 'parallel'))} ARESTES 'PARALLEL': {list(f'({e[0]} -> {e[1]})' for e in test_graph.edges if test_graph.edges[e]['name'] == 'parallel')}\n")
