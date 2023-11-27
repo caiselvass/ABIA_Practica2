@@ -6,14 +6,12 @@ import matplotlib.pyplot as plt
 
 # Definició de classe Book
 class Book:
-	def __init__(self, name: str, pages: int, goal: bool = False, read: bool = False):
+	def __init__(self, name: str, pages: int):
 		self.name: str = name
 		self.pages: int = pages
-		self.goal: bool = goal
-		self.read: bool = read
 
 	def __repr__(self) -> str:
-		return f'{self.name}[{self.pages}]'
+		return f'{self.name}'
 	
 	def __eq__(self, other: 'Book') -> bool:
 		return self.name == other.name
@@ -232,7 +230,7 @@ for i in range(n_tests):
 		# OBJECTS
 		books_str = ' '.join(list(str(n) for n in graphs[i].nodes))
 		months = 'Past January February March April May June July August September October November December'
-		file.write(f'\t;;Objects\n\t(:objects\n\t\t{months} - months\n\t\t{books_str} - books)\n\t)\n')
+		file.write(f'\t;;Objects\n\t(:objects\n\t\t{months} - months\n\t\t{books_str} - books\n\t)\n')
 
 		# INIT
 		file.write('\t;;Init\n\t(:init\n')
@@ -289,6 +287,8 @@ for i in range(n_tests):
 		file.write('\t\t;;Initial pages read per month\n')
 		for m in months.split():
 			file.write(f'\t\t(= (pages_read {m}) 0)\n')
+
+		file.write('\t)\n')
 
 		# GOAL
 		file.write('\t;;Goal\n\t(:goal\n')
@@ -353,12 +353,13 @@ if execute_planner:
 	if operative_system == 'Windows':
 		for i in range(n_tests):
 			if optimize_months:
-				execution = subprocess.run([f'./metricff -O -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				execution = subprocess.run([f'./executables/windows/metricff -O -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 				# Guarda els resultats de l'execució del planner
 				with open(f'./results/opt_reading_plan_{i+1}.txt', 'w') as result_file:
 					result_file.write(execution.stdout.decode('utf-8'))
 			else:
-				execution = subprocess.run([f'./metricff -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				execution = subprocess.run([f'./executables/windows/metricff -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				print(execution.stdout)
 				# Guarda els resultats de l'execució del planner
 				with open(f'./results/results_{i+1}.txt', 'w') as result_file:
 					result_file.write(execution.stdout.decode('utf-8'))
@@ -367,12 +368,12 @@ if execute_planner:
 	elif operative_system == 'Linux':
 		for i in range(n_tests):
 			if optimize_months:
-				execution = subprocess.run([f'./metricff -O -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				execution = subprocess.run([f'./executables/linux/metricff -O -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 				# Guarda els resultats de l'execució del planner
 				with open(f'./results/opt_reading_plan_{i+1}.txt', 'w') as result_file:
 					result_file.write(execution.stdout.decode('utf-8'))
 			else:
-				execution = subprocess.run([f'./metricff -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				execution = subprocess.run([f'./executables/linux/metricff -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 				# Guarda els resultats de l'execució del planner
 				with open(f'./results/reading_plan_{i+1}.txt', 'w') as result_file:
 					result_file.write(execution.stdout.decode('utf-8'))
@@ -381,12 +382,12 @@ if execute_planner:
 	elif operative_system == 'Darwin':
 		for i in range(n_tests):
 			if optimize_months:
-				execution = subprocess.run([f'./ff -O -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				execution = subprocess.run([f'./executables/macos/ff -O -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 				# Guarda els resultats de l'execució del planner
 				with open(f'./results/opt_reading_plan_{i+1}.txt', 'w') as result_file:
 					result_file.write(execution.stdout.decode('utf-8'))
 			else:
-				execution = subprocess.run([f'./ff -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				execution = subprocess.run([f'./executables/macos/ff -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 				# Guarda els resultats de l'execució del planner
 				with open(f'./results/reading_plan_ext_{level}_{i+1}.txt', 'w') as result_file:
 					result_file.write(execution.stdout.decode('utf-8'))
