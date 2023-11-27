@@ -237,7 +237,19 @@ for i in range(n_tests):
 		# INIT
 		file.write('\t;;Init\n\t(:init\n')
 		
-		# ordre dels mesos aqui
+		# Order the months
+		file.write('\t\t;;Order the months\n')
+		file.write('\t\t(next_month January February)\n')
+		file.write('\t\t(next_month February March)\n')
+		file.write('\t\t(next_month March April)\n')
+		file.write('\t\t(next_month April May)\n')
+		file.write('\t\t(next_month May June)\n')
+		file.write('\t\t(next_month June July)\n')
+		file.write('\t\t(next_month July August)\n')
+		file.write('\t\t(next_month August September)\n')
+		file.write('\t\t(next_month September October)\n')
+		file.write('\t\t(next_month October November)\n')
+		file.write('\t\t(next_month November December)\n')
 
 		# Initial number of months
 		file.write('\t\t;;Initial number of months\n')
@@ -260,9 +272,17 @@ for i in range(n_tests):
 			if graphs[i].edges[e]['name'] == 'parallel':
 				file.write(f'\t\t(parallel {e[0]} {e[1]})\n')
 
-		# llibres goal aqui
+		# Goal books
+		file.write('\t\t;;Books the user would like to read\n')
+		for b in np.random.choice(list(graphs[i].nodes), size=np.random.randint(1, len(list(graphs[i].nodes)) + 1), replace=False):
+			file.write(f'\t\t(goal_book {b})\n')
 
-		# llibres llegits aqui
+		# Read books
+		file.write('\t\t;;Books the user has already read\n')
+		for b in np.random.choice(list(graphs[i].nodes), size=np.random.randint(1, len(list(graphs[i].nodes)) + 1), replace=False):
+			file.write(f'\t\t(read {b})\n')
+			file.write(f'\t\t(goal_book {b})')
+			file.write(f'\t\t(assigned {b} Past)\n)')
 
 		# Book pages
 		file.write('\t\t;;Book pages\n')

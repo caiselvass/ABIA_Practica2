@@ -18,14 +18,21 @@
         (predecessor book1 book2)
         (predecessor book2 book3)
         (predecessor book3 book4)
-        (parallel book5 book1)
-        (parallel book5 book6)
-        (parallel book5 book8)
+        (predecessor book4 book5)
+        (predecessor book5 book6)
+        (predecessor book6 book7)
+        (parallel book10 book9)
+        (parallel book10 book11)
+        (parallel book10 book12)
 
         ;; Books the user would like to read
-        (goal_book book5)
-        (goal_book book6)
+        (goal_book book7)
         (goal_book book8)
+        (goal_book book9)
+        (goal_book book10)
+        (goal_book book11)
+        (goal_book book12)
+        (goal_book book15)
 
 
 

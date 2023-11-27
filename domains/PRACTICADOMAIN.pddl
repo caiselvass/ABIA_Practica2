@@ -34,7 +34,7 @@
             (or (goal_book ?b) (exists (?x - book) (predecessor ?b ?x)))
             (current_month ?actualm)
             (previous_month ?prevm)
-            ;; The predecessors must have been read before the book's month
+            ;; The predecessors must have been recmk l nhlu fly cl v7 vblfc vy cfyf  yfl xtrd lc yfl d cclcad before the book's month
             (forall (?pre - book) (imply (predecessor ?pre ?b) (and (read ?pre) (not (assigned ?pre ?actualm)))))
             ;; The parallel books must be a goal to be read before the book's month or in the same month
             (forall (?par - book) (imply (and (parallel ?b ?par) (goal_book ?par)) (or (assigned ?par ?actualm) (assigned ?par ?prevm))))
