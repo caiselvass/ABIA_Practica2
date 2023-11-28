@@ -36,16 +36,18 @@ def has_cycle(graph: nx.DiGraph, u: Book, v: Book) -> bool:
 		graph.remove_edge(u, v)
 	return False
 
-def add_edge_if_no_cycle(graph: nx.DiGraph, u: Book, v: Book, edge_name: str) -> None:
+def add_edge_if_no_cycle(graph: nx.DiGraph, u: Book, v: Book, edge_name: str) -> bool:
 	assert edge_name in {'predecessor', 'parallel'}, "Error: El nom de l'aresta ha de ser 'predecessor' o 'parallel'."
 	"""
 	Afegeix l'aresta (u, v) al graf si no crea un cicle.
 	"""
 	if has_cycle(graph, u, v):
 		print(f"\t* L'aresta P{edge_name[1:]}({u} -> {v}) crearia un cicle. No s'ha afegit.")
+		return False
 	else:
 		graph.add_edge(u, v, name=edge_name)
 		print(f"\t* Aresta P{edge_name[1:]}({u} -> {v}) afegida correctament.")
+		return True
 
 # Nivell d'extensió dels jocs de proves
 while True:
@@ -220,7 +222,7 @@ for i, test_graph in enumerate(graphs):
 						tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
 						if tmp_pred != b:
 							break
-					add_edge_if_no_cycle(test_graph, tmp_pred, b, edge_name='predecessor')
+					add_edge_if_no_cycle(test_graph, tmp_pred, b, edge_name='predecessor'):
 			
 			if np.random.choice([True, False]):
 				for _ in range(np.random.randint(0, len(tmp_addi_books))):
