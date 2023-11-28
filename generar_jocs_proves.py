@@ -20,15 +20,20 @@ class Book:
 		return hash(self.name)
 
 # Definició de funcions auxiliars
-def has_cycle(graph: nx.DiGraph, u: Book, v: Book) -> bool:
+def has_cycle(graph: nx.DiGraph, u: Book, v: Book, cycle_type: str = 'directed') -> bool:
+	assert cycle_type in {'directed', 'undirected'}, "Error: El tipus de cicle ha de ser 'directed' o 'undirected'."
 	"""
 	Retorna True si la aresta (u, v) crea un cicle en el graf, False en cas contrari.
 	"""
 	try:
 		# Afegeix la arista (u, v) al graf i comprova si hi ha cicle
 		graph.add_edge(u, v)
-		if nx.find_cycle(graph, orientation='original'):
-			return True
+		if cycle_type == 'directed':
+			if nx.find_cycle(graph, orientation='original'):
+				return True
+		elif cycle_type == 'undirected':
+			if nx.find_cycle(graph, orientation='ignore'):
+				return True
 	except:
 		pass
 	finally:
@@ -36,17 +41,18 @@ def has_cycle(graph: nx.DiGraph, u: Book, v: Book) -> bool:
 		graph.remove_edge(u, v)
 	return False
 
-def add_edge_if_no_cycle(graph: nx.DiGraph, u: Book, v: Book, edge_name: str) -> bool:
+def add_edge_if_no_cycle(graph: nx.DiGraph, u: Book, v: Book, edge_name: str, cycle_type: str = 'directed') -> bool:
 	assert edge_name in {'predecessor', 'parallel'}, "Error: El nom de l'aresta ha de ser 'predecessor' o 'parallel'."
+	assert cycle_type in {'directed', 'undirected'}, "Error: El tipus de cicle ha de ser 'directed' o 'undirected'."
 	"""
 	Afegeix l'aresta (u, v) al graf si no crea un cicle.
 	"""
-	if has_cycle(graph, u, v):
+	if has_cycle(graph, u, v, cycle_type=cycle_type):
 		print(f"\t* L'aresta P{edge_name[1:]}({u} -> {v}) crearia un cicle. No s'ha afegit.")
 		return False
 	else:
 		graph.add_edge(u, v, name=edge_name)
-		print(f"\t* Aresta P{edge_name[1:]}({u} -> {v}) afegida correctament.")
+		print(f"\t* Aresta {edge_name.capitalize()}({u} -> {v}) afegida correctament.")
 		return True
 
 # Nivell d'extensió dels jocs de proves
@@ -150,17 +156,20 @@ while True:
 		if max_addi_books < 0:
 			raise ValueError
 		else:
-			while True:
-				try:
-					seed: Union[int, None] = int(input("Introdueix la llavor per generar aleatòriament diferents nombres de llibres addicionals per cada joc de proves (0 per triar una llavor qualsevol): ").replace(' ', ''))
-					if seed == 0:
-						seed = None
-						np.random.seed(seed)
-				except ValueError:
-					print("Error: Introdueix un nombre enter.")
-					continue
-				break
-			num_addi_books_list: list[int] = [np.random.randint(0, max_addi_books + 1) for _ in range(n_tests)]
+			if max_addi_books == 0:
+				num_addi_books_list: list[int] = [0 for _ in range(n_tests)]
+			else:
+				while True:
+					try:
+						seed: Union[int, None] = int(input("Introdueix la llavor per generar aleatòriament diferents nombres de llibres addicionals per cada joc de proves (0 per triar una llavor qualsevol): ").replace(' ', ''))
+						if seed == 0:
+							seed = None
+							np.random.seed(seed)
+					except ValueError:
+						print("Error: Introdueix un nombre enter.")
+						continue
+					break
+				num_addi_books_list: list[int] = [np.random.randint(1, max_addi_books + 1) for _ in range(n_tests)]				
 	except ValueError:
 		print("Error: Introdueix un nombre enter >= 0.")
 		continue
@@ -170,86 +179,88 @@ while True:
 for i, test_graph in enumerate(graphs):
 	num_addi_books: int = num_addi_books_list[i]
 	print(f"\nJOC DE PROVES [{i+1}] --> {num_addi_books} llibres addicionals afegits.")
-	tmp_addi_books: list[Book] = []
 	
-	for b in range(num_addi_books):
-		if level == 3:
-			while True:
-				tmp_pages: int = int(np.random.normal(275, 100))
-				if 10 <= tmp_pages <= 800:
-					break
-		
-			tmp_book: Book = Book(f'Book_{b+1}', tmp_pages)
-		else:
-			tmp_book: Book = Book(f'Book_{b+1}')
-		tmp_addi_books.append(tmp_book)
-		test_graph.add_node(tmp_book)
-
-	if level == 0:
-		# Nivel básico: En el plan de lectura todos los libros tienen 0 o 1 predecesores y ningún paralelo.
-		# El planner es capaz de encontrar un plan para poder llegar a leer los libros objetivo encadenando
-		# libros, donde cada libro tiene solo uno o ningún predecesor.
-		for b in tmp_addi_books:
-			if np.random.choice([True, False]):
+	# Afegir llibres addicionals (només en cas que n'hi hagi)
+	if num_addi_books > 0:
+		tmp_addi_books: list[Book] = []
+		for b in range(num_addi_books):
+			if level == 3:
 				while True:
-					tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
-					if tmp_pred != b:
+					tmp_pages: int = int(np.random.normal(275, 100))
+					if 10 <= tmp_pages <= 800:
 						break
-				add_edge_if_no_cycle(test_graph, tmp_pred, b, edge_name='predecessor')
-		
-	elif level == 1:
-		# Extensión 1: Los libros pueden tener de 0 a N predecesores pero ningún paralelo. El planner
-		# es capaz de construir un plan para poder llegar a leer los libros objetivo, donde para todo
-		# libro que pertenece al plan, todos sus libros predecesores pertenecen al plan y están en meses anteriores.
-		for b in tmp_addi_books:
-			if np.random.choice([True, False]):
-				for _ in range(np.random.randint(0, len(tmp_addi_books))):
-					while True:
-						tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
-						if tmp_pred != b:
-							break
-					add_edge_if_no_cycle(test_graph, tmp_pred, b, edge_name='predecessor')
-
-	elif level == 2:
-		# Extensión 2: Extensión 1 + los libros pueden tener de 0 a M libros paralelos. El planner es
-		# capaz de construir un plan para poder llegar a leer los libros objetivo, donde para todo libro
-		# que pertenece al plan, todos sus libros paralelos pertenecen al plan y están en el mismo mes o
-		# en meses anteriores.
-		for b in tmp_addi_books:
-			if np.random.choice([True, False]):
-				for _ in range(np.random.randint(0, len(tmp_addi_books))):
-					while True:
-						tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
-						if tmp_pred != b:
-							break
-					add_edge_if_no_cycle(test_graph, tmp_pred, b, edge_name='predecessor'):
 			
-			if np.random.choice([True, False]):
-				for _ in range(np.random.randint(0, len(tmp_addi_books))):
+				tmp_book: Book = Book(f'Book_{b+1}', tmp_pages)
+			else:
+				tmp_book: Book = Book(f'Book_{b+1}')
+			tmp_addi_books.append(tmp_book)
+			test_graph.add_node(tmp_book)
+	
+		if level == 0:
+			# Nivel básico: En el plan de lectura todos los libros tienen 0 o 1 predecesores y ningún paralelo.
+			# El planner es capaz de encontrar un plan para poder llegar a leer los libros objetivo encadenando
+			# libros, donde cada libro tiene solo uno o ningún predecesor.
+			for b in tmp_addi_books:
+				if np.random.choice([True, False]):
+					while True:
+						tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
+						if tmp_pred != b:
+							break
+					add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
+			
+		elif level == 1:
+			# Extensión 1: Los libros pueden tener de 0 a N predecesores pero ningún paralelo. El planner
+			# es capaz de construir un plan para poder llegar a leer los libros objetivo, donde para todo
+			# libro que pertenece al plan, todos sus libros predecesores pertenecen al plan y están en meses anteriores.
+			for b in tmp_addi_books:
+				for _ in range(np.random.randint(num_addi_books)):
+					while True:
+						tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
+						if tmp_pred != b:
+							break
+					add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
+
+		elif level == 2:
+			# Extensión 2: Extensión 1 + los libros pueden tener de 0 a M libros paralelos. El planner es
+			# capaz de construir un plan para poder llegar a leer los libros objetivo, donde para todo libro
+			# que pertenece al plan, todos sus libros paralelos pertenecen al plan y están en el mismo mes o
+			# en meses anteriores.
+			for b in tmp_addi_books:
+				for _ in range(np.random.randint(num_addi_books)):
+					while True:
+						tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
+						if tmp_pred != b:
+							break
+					add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
+			
+			for b in tmp_addi_books:
+				for _ in range(np.random.randint(num_addi_books)):
 					while True:
 						tmp_parallel: Book = np.random.choice(np.array(tmp_addi_books))
 						if tmp_parallel != b:
 							break
-					add_edge_if_no_cycle(test_graph, tmp_parallel, b, edge_name='parallel')
+					add_edge_if_no_cycle(graph=test_graph, u=tmp_parallel, v=b, edge_name='parallel', cycle_type='directed')
 		
-	elif level == 3:
-		# Extensión 3: Los libros tienen además un número de páginas. El planificador controla que en
-		# el plan generado no se superen las 800 páginas al mes.
-		for b in tmp_addi_books:
-			if np.random.choice([True, False]):
-				for _ in range(np.random.randint(0, len(tmp_addi_books))):
+		elif level == 3:
+			# Extensión 3: Los libros tienen además un número de páginas. El planificador controla que en
+			# el plan generado no se superen las 800 páginas al mes.
+			for b in tmp_addi_books:
+				for _ in range(np.random.randint(num_addi_books)):
 					while True:
 						tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
 						if tmp_pred != b:
 							break
-					add_edge_if_no_cycle(test_graph, tmp_pred, b, edge_name='predecessor')
+					add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
 			
-			if np.random.choice([True, False]):
-				while True:
-					tmp_parallel: Book = np.random.choice(np.array(tmp_addi_books))
-					if tmp_parallel != b:
-						break
-				add_edge_if_no_cycle(test_graph, tmp_parallel, b, edge_name='parallel')
+			for b in tmp_addi_books:
+				for _ in range(np.random.randint(num_addi_books)):
+					while True:
+						tmp_parallel: Book = np.random.choice(np.array(tmp_addi_books))
+						if tmp_parallel != b:
+							break
+					# Comprova que la suma de les pàgines dels llibres paral·lels no superi les 1600 pàgines (2 mesos amb un màxim de 800 pàgines cada mes)
+					if sum(test_graph.nodes[n].pages for n in test_graph.neighbors(tmp_parallel)) + test_graph.nodes[b].pages <= 1600:
+						add_edge_if_no_cycle(graph=test_graph, u=tmp_parallel, v=b, edge_name='parallel', cycle_type='directed')
 
 # Mostra els grafs de cada joc de proves
 for i, test_graph in enumerate(graphs):
