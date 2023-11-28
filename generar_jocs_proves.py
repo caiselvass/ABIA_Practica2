@@ -234,11 +234,11 @@ for i, test_graph in enumerate(graphs):
 					add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
 			
 			for b in tmp_addi_books:
-				for _ in range(np.random.randint(num_addi_books)):
-					while True:
-						tmp_parallel: Book = np.random.choice(np.array(tmp_addi_books))
-						if tmp_parallel != b:
-							break
+				while True:
+					tmp_parallel: Book = np.random.choice(np.array(tmp_addi_books))
+					if tmp_parallel != b:
+						break
+				if tmp_parallel not in test_graph.neighbors(b):
 					add_edge_if_no_cycle(graph=test_graph, u=tmp_parallel, v=b, edge_name='parallel', cycle_type='directed')
 		
 		elif level == 3:
@@ -253,14 +253,13 @@ for i, test_graph in enumerate(graphs):
 					add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
 			
 			for b in tmp_addi_books:
-				for _ in range(np.random.randint(num_addi_books)):
-					while True:
-						tmp_parallel: Book = np.random.choice(np.array(tmp_addi_books))
-						if tmp_parallel != b:
-							break
-					# Comprova que la suma de les pàgines dels llibres paral·lels no superi les 1600 pàgines (2 mesos amb un màxim de 800 pàgines cada mes)
-					if sum(test_graph.nodes[n].pages for n in test_graph.neighbors(tmp_parallel)) + test_graph.nodes[b].pages <= 1600:
-						add_edge_if_no_cycle(graph=test_graph, u=tmp_parallel, v=b, edge_name='parallel', cycle_type='directed')
+				while True:
+					tmp_parallel: Book = np.random.choice(np.array(tmp_addi_books))
+					if tmp_parallel != b:
+						break
+				# Comprova que la suma de les pàgines dels llibres paral·lels no superi les 1600 pàgines (2 mesos amb un màxim de 800 pàgines cada mes)
+				if tmp_parallel not in test_graph.neighbors(b) and sum(test_graph.nodes[n].pages for n in test_graph.neighbors(tmp_parallel)) + test_graph.nodes[b].pages <= 1600:
+					add_edge_if_no_cycle(graph=test_graph, u=tmp_parallel, v=b, edge_name='parallel', cycle_type='directed')
 
 # Mostra els grafs de cada joc de proves
 for i, test_graph in enumerate(graphs):
