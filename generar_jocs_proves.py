@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 
 # Definició de classe Book
 class Book:
-	def __init__(self, name: str, pages: int):
+	def __init__(self, name: str, pages: Union[None, int] = None):
 		self.name: str = name
-		self.pages: int = pages
+		self.pages: Union[None, int] = pages
 
 	def __repr__(self) -> str:
 		return f'{self.name}'
@@ -18,7 +18,6 @@ class Book:
 	
 	def __hash__(self) -> int:
 		return hash(self.name)
-	
 
 # Definició de funcions auxiliars
 def has_cycle(graph: nx.DiGraph, u: Book, v: Book) -> bool:
@@ -43,11 +42,10 @@ def add_edge_if_no_cycle(graph: nx.DiGraph, u: Book, v: Book, edge_name: str) ->
 	Afegeix l'aresta (u, v) al graf si no crea un cicle.
 	"""
 	if has_cycle(graph, u, v):
-		print(f"\t* L'aresta ({u} -> {v}) crearia un cicle. No s'ha afegit.")
+		print(f"\t* L'aresta P{edge_name[1:]}({u} -> {v}) crearia un cicle. No s'ha afegit.")
 	else:
 		graph.add_edge(u, v, name=edge_name)
-		print(f"\t* Aresta ({u} -> {v}) afegida correctament.")
-
+		print(f"\t* Aresta P{edge_name[1:]}({u} -> {v}) afegida correctament.")
 
 # Nivell d'extensió dels jocs de proves
 while True:
@@ -81,7 +79,7 @@ graphs: list[nx.DiGraph] = [nx.DiGraph() for _ in range(n_tests)]
 
 # Llibres de la saga de Harry Potter
 hp_list: list[list[Union[str, int]]] = [
-	['HP1_Harry_Potter_and_the_Philosopher\'s_Stone', 220],
+	['HP1_Harry_Potter_and_the_Philosophers_Stone', 220],
 	['HP2_Harry_Potter_and_the_Chamber_of_Secrets', 250],
 	['HP3_Harry_Potter_and_the_Prisoner_of_Azkaban', 315],
 	['HP4_Harry_Potter_and_the_Goblet_of_Fire', 635],
@@ -101,7 +99,7 @@ lr_list: list[list[Union[str, int]]] = [
 	['LR2_The_Two_Towers', 350],
 	['LR3_The_Return_of_the_King', 415]
 ]
-lr_books: list[Book] = [Book(name, pages) for name, pages in lr_list]
+lr_books: list[Book] = [Book(name=n, pages=p) for n, p in lr_list]
 lr_graph = nx.DiGraph()
 lr_graph.add_nodes_from(lr_books)
 for i in range(len(lr_books) - 1):
@@ -113,7 +111,7 @@ hg_list: list[list[Union[str, int]]] = [
 	['HG2_Catching_Fire', 390],
 	['HG3_Mockingjay', 390]
 ]
-hg_books: list[Book] = [Book(name, pages) for name, pages in hg_list]
+hg_books: list[Book] = [Book(name=n, pages=p) for n, p in hg_list]
 hg_graph = nx.DiGraph()
 
 for i in range(len(hg_books) - 1):
@@ -173,17 +171,20 @@ for i, test_graph in enumerate(graphs):
 	tmp_addi_books: list[Book] = []
 	
 	for b in range(num_addi_books):
-		while True:
-			tmp_pages: int = int(np.random.normal(275, 100))
-			if 10 <= tmp_pages <= 800:
-				break
+		if level == 3:
+			while True:
+				tmp_pages: int = int(np.random.normal(275, 100))
+				if 10 <= tmp_pages <= 800:
+					break
 		
-		tmp_book: Book = Book(f'Book_{b+1}', tmp_pages)
+			tmp_book: Book = Book(f'Book_{b+1}', tmp_pages)
+		else:
+			tmp_book: Book = Book(f'Book_{b+1}')
 		tmp_addi_books.append(tmp_book)
 		test_graph.add_node(tmp_book)
 
 	if level == 0:
-		#Nivel básico: En el plan de lectura todos los libros tienen 0 o 1 predecesores y ningún paralelo.
+		# Nivel básico: En el plan de lectura todos los libros tienen 0 o 1 predecesores y ningún paralelo.
 		# El planner es capaz de encontrar un plan para poder llegar a leer los libros objetivo encadenando
 		# libros, donde cada libro tiene solo uno o ningún predecesor.
 		for b in tmp_addi_books:
@@ -195,27 +196,58 @@ for i, test_graph in enumerate(graphs):
 				add_edge_if_no_cycle(test_graph, tmp_pred, b, edge_name='predecessor')
 		
 	elif level == 1:
-		#Extensión 1: Los libros pueden tener de 0 a N predecesores pero ningún paralelo. El planner
+		# Extensión 1: Los libros pueden tener de 0 a N predecesores pero ningún paralelo. El planner
 		# es capaz de construir un plan para poder llegar a leer los libros objetivo, donde para todo
 		# libro que pertenece al plan, todos sus libros predecesores pertenecen al plan y están en meses anteriores.
 		for b in tmp_addi_books:
-			for _ in range(np.random.randint(0, len(tmp_addi_books))):
-				while True:
-					tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
-					if tmp_pred != b:
-						break
-				add_edge_if_no_cycle(test_graph, tmp_pred, b, edge_name='predecessor')
+			if np.random.choice([True, False]):
+				for _ in range(np.random.randint(0, len(tmp_addi_books))):
+					while True:
+						tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
+						if tmp_pred != b:
+							break
+					add_edge_if_no_cycle(test_graph, tmp_pred, b, edge_name='predecessor')
 
-	# elif level == 2:
-	# 	#Extensión 2: Extensión 1 + los libros pueden tener de 0 a M libros paralelos. El planner es
-	# 	# capaz de construir un plan para poder llegar a leer los libros objetivo, donde para todo libro
-	# 	# que pertenece al plan, todos sus libros paralelos pertenecen al plan y están en el mismo mes o
+	elif level == 2:
+		# Extensión 2: Extensión 1 + los libros pueden tener de 0 a M libros paralelos. El planner es
+		# capaz de construir un plan para poder llegar a leer los libros objetivo, donde para todo libro
+		# que pertenece al plan, todos sus libros paralelos pertenecen al plan y están en el mismo mes o
 		# en meses anteriores.
+		for b in tmp_addi_books:
+			if np.random.choice([True, False]):
+				for _ in range(np.random.randint(0, len(tmp_addi_books))):
+					while True:
+						tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
+						if tmp_pred != b:
+							break
+					add_edge_if_no_cycle(test_graph, tmp_pred, b, edge_name='predecessor')
+			
+			if np.random.choice([True, False]):
+				for _ in range(np.random.randint(0, len(tmp_addi_books))):
+					while True:
+						tmp_parallel: Book = np.random.choice(np.array(tmp_addi_books))
+						if tmp_parallel != b:
+							break
+					add_edge_if_no_cycle(test_graph, tmp_parallel, b, edge_name='parallel')
 		
 	elif level == 3:
-		#Extensión 3: Los libros tienen además un número de páginas. El planificador controla que en
+		# Extensión 3: Los libros tienen además un número de páginas. El planificador controla que en
 		# el plan generado no se superen las 800 páginas al mes.
-		test_graph.add_edge(np.random.choice(list(test_graph.nodes)), list(test_graph.nodes)[-1], name=np.random.choice(['predecessor', 'parallel']))
+		for b in tmp_addi_books:
+			if np.random.choice([True, False]):
+				for _ in range(np.random.randint(0, len(tmp_addi_books))):
+					while True:
+						tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
+						if tmp_pred != b:
+							break
+					add_edge_if_no_cycle(test_graph, tmp_pred, b, edge_name='predecessor')
+			
+			if np.random.choice([True, False]):
+				while True:
+					tmp_parallel: Book = np.random.choice(np.array(tmp_addi_books))
+					if tmp_parallel != b:
+						break
+				add_edge_if_no_cycle(test_graph, tmp_parallel, b, edge_name='parallel')
 
 # Mostra els grafs de cada joc de proves
 for i, test_graph in enumerate(graphs):
@@ -228,12 +260,11 @@ for i, test_graph in enumerate(graphs):
 	nx.draw(test_graph, with_labels=True, node_color='lightgray', edge_color=edge_colors, node_size=250, arrowstyle='->', arrowsize=35, font_size=6)
 	plt.show()
 
-
 # Generació dels jocs de proves
 for i in range(n_tests):
 	with open(f'./problems/generated_problem_ext_{level}_{i+1}.pddl', 'w') as file:
 		# HEADER
-		file.write(f'(define (problem reading_plan_problem_{i+1})\n\t(:domain reading_plan)\n')
+		file.write(f'(define (problem reading_plan_problem_ext_{level}_{i+1})\n\t(:domain reading_plan)\n')
 
 		# OBJECTS
 		books_str = ' '.join(list(str(n) for n in graphs[i].nodes))
@@ -250,10 +281,6 @@ for i in range(n_tests):
 		file.write('\t\t(next_month July August) (next_month August September) (next_month September October)\n')
 		file.write('\t\t(next_month October November) (next_month November December)\n')
 
-		# Initial number of months
-		file.write('\t\t;;Initial number of months\n')
-		file.write('\t\t(= (num_months_created) 1)\n')
-
 		# Start on month 1
 		file.write('\t\t;;Start on month 1\n')
 		file.write('\t\t(current_month January)\n')
@@ -265,11 +292,12 @@ for i in range(n_tests):
 			if graphs[i].edges[e]['name'] == 'predecessor':
 				file.write(f'\t\t(predecessor {e[0]} {e[1]})\n')
 		
-		# Parallels
-		file.write('\t\t;;Parallels\n')
-		for e in graphs[i].edges:
-			if graphs[i].edges[e]['name'] == 'parallel':
-				file.write(f'\t\t(parallel {e[0]} {e[1]})\n')
+		if level >= 2:
+			# Parallels
+			file.write('\t\t;;Parallels\n')
+			for e in graphs[i].edges:
+				if graphs[i].edges[e]['name'] == 'parallel':
+					file.write(f'\t\t(parallel {e[0]} {e[1]})\n')
 
 		# Goal books
 		file.write('\t\t;;Books the user would like to read\n')
@@ -286,15 +314,20 @@ for i in range(n_tests):
 			file.write(f'\t\t(goal_book {b})\n')
 			file.write(f'\t\t(assigned {b} Past)\n')
 
-		# Book pages
-		file.write('\t\t;;Book pages\n')
-		for n in graphs[i].nodes:
-			file.write(f'\t\t(= (total_pages {n}) {n.pages})\n')
-
-		# Initial pages read per month
-		file.write('\t\t;;Initial pages read per month\n')
-		for m in months.split():
-			file.write(f'\t\t(= (pages_read {m}) 0)\n')
+		if level == 3:
+			# Book pages
+			file.write('\t\t;;Book pages\n')
+			for n in graphs[i].nodes:
+				file.write(f'\t\t(= (total_pages {n}) {n.pages})\n')
+			
+			# Initial pages read per month
+			file.write('\t\t;;Initial pages read per month\n')
+			for m in months.split():
+				file.write(f'\t\t(= (pages_read {m}) 0)\n')
+			
+			# Initial number of months
+			file.write('\t\t;;Initial number of months\n')
+			file.write('\t\t(= (num_months_created) 1)\n')
 
 		file.write('\t)\n')
 
@@ -303,8 +336,9 @@ for i in range(n_tests):
 		file.write('\t\t(and\n')
 		file.write('\t\t\t(forall (?b - book) (imply (goal_book ?b) (read ?b)))\n\t\t)\n\t)\n')
 
-		# METRICS
-		file.write('\t;;Optimize the number of months\n\t(:metric minimize (num_months_created))\n')
+		if level == 3:
+			# METRICS
+			file.write('\t;;Optimize the number of months\n\t(:metric minimize (num_months_created))\n')
 
 		# FOOTER
 		file.write(')')
@@ -330,23 +364,26 @@ while True:
 
 if execute_planner:
 	# Optimitzar el nombre de mesos
-	while True:
-		try:
-			optimize_months: Union[bool, str] = input("Vols aplicar l'optimitzador de nombre de mesos? (HELP per més informació) [Y/N/HELP]: ").replace(' ', '')
-			if optimize_months not in {'Y', 'y', 'N', 'n', 'HELP', 'help'}:
-				raise ValueError
-			else:
-				if optimize_months in {'HELP', 'help'}:
-					print("L'optimitzador de nombre de mesos afegeix el flag '-O' a l'execució. D'aquesta manera es garantitza que el nombre de mesos que es generen en el plan sigui el mínim possible, però el cost computacional és considerablement més alt.")
-					continue
-				elif optimize_months in {'Y', 'y'}:
-					optimize_months = True
+	optimize_months: Union[bool, str] = False
+	
+	if level == 3:
+		while True:
+			try:
+				optimize_months = input("Vols aplicar l'optimitzador de nombre de mesos? (HELP per més informació) [Y/N/HELP]: ").replace(' ', '')
+				if optimize_months not in {'Y', 'y', 'N', 'n', 'HELP', 'help'}:
+					raise ValueError
 				else:
-					optimize_months = False
-		except ValueError:
-			print("Error: Introdueix només un dels següents valors: Y, N, HELP.")
-			continue
-		break
+					if optimize_months in {'HELP', 'help'}:
+						print("L'optimitzador de nombre de mesos afegeix el flag '-O' a l'execució. D'aquesta manera es garantitza que el nombre de mesos que es generen en el plan sigui el mínim possible, però el cost computacional és considerablement més alt.")
+						continue
+					elif optimize_months in {'Y', 'y'}:
+						optimize_months = True
+					else:
+						optimize_months = False
+			except ValueError:
+				print("Error: Introdueix només un dels següents valors: Y, N, HELP.")
+				continue
+			break
 
 	# Execució del planner
 	import platform #Per saber si estem a Windows, Linux o MacOS
