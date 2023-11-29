@@ -81,7 +81,6 @@ def parallel_chained_nodes(graph: nx.DiGraph, initial_node: Book) -> set[Book]:
 
 	return parallel_chain
 
-
 # Nivell d'extensió dels jocs de proves
 while True:
 	try:
@@ -340,16 +339,36 @@ for i in range(n_tests):
 			if graphs[i].edges[e]['name'] == 'predecessor':
 				file.write(f'\t\t(predecessor {e[0]} {e[1]})\n')
 		
+		# Goal books 
+		goal_books: set = set(np.random.choice(list(graphs[i].nodes), size=np.random.randint(1, len(list(graphs[i].nodes)) + 1), replace=False))
+		
 		if level >= 2:
 			# Parallels
+			parallel_groups = {}
 			file.write('\t\t;;Parallels\n')
+			for n in set(graphs[i].nodes):
+				if tuple(parallel_chained_nodes(graph=graphs[i], initial_node=n)) in parallel_groups.keys():
+					parallel_groups[tuple(parallel_chained_nodes(graph=graphs[i], initial_node=n))].add(n)
+				else:
+					parallel_groups[tuple(parallel_chained_nodes(graph=graphs[i], initial_node=n))] = {n}
+			
+			for group in parallel_groups.values():
+				group_root = list(group)[0]
+				for n in group:
+					if n in goal_books:
+						group_root = n
+						break
+			
+				for n in group:
+					if n != group_root:
+						file.write(f'\t\t(parallel {group_root} {n})\n')
+
 			for e in graphs[i].edges:
 				if graphs[i].edges[e]['name'] == 'parallel':
 					file.write(f'\t\t(parallel {e[0]} {e[1]})\n')
 
 		# Goal books
 		file.write('\t\t;;Books the user would like to read\n')
-		goal_books:set = set(np.random.choice(list(graphs[i].nodes), size=np.random.randint(1, len(list(graphs[i].nodes)) + 1), replace=False))
 		for b in goal_books:
 			file.write(f'\t\t(goal_book {b})\n')
 
