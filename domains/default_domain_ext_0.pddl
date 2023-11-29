@@ -20,21 +20,17 @@
 
     ;; Actions
     (:action assign_book
-    :parameters (?b - book ?actualm - month ?prevm - month ?pre - book)
+    :parameters (?b - book ?actualm - month ?pre - book)
     :precondition (and
         (not (read ?b))
-        (or (goal_book ?b) (and (predecessor ?b ?pre) (goal_book ?pre)))
         (current_month ?actualm)
-        (previous_month ?prevm)
-        ;; The predecessor must have been read before the book's month
-        (or (not (predecessor ?pre ?b)) 
-            (and (predecessor ?pre ?b) (read ?pre) (not (assigned ?pre ?actualm))))
+        (or (and (predecessor ?b ?pre) (goal_book ?pre) (not(read ?pre)) (not (assigned ?pre ?actualm))) (goal_book ?b))
     )
     :effect (and
         (read ?b)
         (assigned ?b ?actualm)
+        )
     )
-)
 
 
 
