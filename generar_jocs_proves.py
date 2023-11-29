@@ -159,7 +159,7 @@ hg_graph.add_edge(hg_books['HG2_Catching_Fire'], hg_books['HG3_Mockingjay'], nam
 mv_dict: dict = {
 	'Avengers_1': 200,
 	'Avengers_2': 250,
-	'Avengers_3': 250,
+	'Avengers_3': 500,
 	'Ironman': 300,
 	'Hulk': 250,
 	'Captain_America': 350,
@@ -169,9 +169,9 @@ mv_dict: dict = {
 	'Spiderman_1': 250,
 	'Spiderman_2': 300,
 	'Guardians_of_the_Galaxy_1': 300,
-	'Guardians_of_the_Galaxy_2': 200,
+	'Guardians_of_the_Galaxy_2': 550,
 	'Guardians_of_the_Galaxy_3': 250,
-	'Groot': 200,
+	'Groot': 400,
 }
 mv_books: dict = {n: Book(name=n, pages=p) for n, p in mv_dict.items()}
 mv_graph = nx.DiGraph()
