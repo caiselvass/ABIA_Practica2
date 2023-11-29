@@ -112,65 +112,110 @@ while True:
 graphs: list[nx.DiGraph] = [nx.DiGraph() for _ in range(n_tests)]
 
 # Llibres de la saga de Harry Potter
-hp_list: list[list[Union[str, int]]] = [
-	['HP1_Harry_Potter_and_the_Philosophers_Stone', 220],
-	['HP2_Harry_Potter_and_the_Chamber_of_Secrets', 250],
-	['HP3_Harry_Potter_and_the_Prisoner_of_Azkaban', 315],
-	['HP4_Harry_Potter_and_the_Goblet_of_Fire', 635],
-	['HP5_Harry_Potter_and_the_Order_of_the_Phoenix', 765],
-	['HP6_Harry_Potter_and_the_Half-Blood_Prince', 605],
-	['HP7_Harry_Potter_and_the_Deathly_Hallows', 605]
-]
-hp_books: list[Book] = [Book(name=n, pages=p) for n, p in hp_list]
+hp_dict: dict = {
+	'HP1_Harry_Potter_and_the_Philosophers_Stone': 220,
+	'HP2_Harry_Potter_and_the_Chamber_of_Secrets': 250,
+	'HP3_Harry_Potter_and_the_Prisoner_of_Azkaban': 315,
+	'HP4_Harry_Potter_and_the_Goblet_of_Fire': 635,
+	'HP5_Harry_Potter_and_the_Order_of_the_Phoenix': 765,
+	'HP6_Harry_Potter_and_the_Half-Blood_Prince': 600,
+	'HP7_Harry_Potter_and_the_Deathly_Hallows': 600
+}
+hp_books: dict = {n: Book(name=n, pages=p) for n, p in hp_dict.items()}
 hp_graph = nx.DiGraph()
-hp_graph.add_nodes_from(hp_books)
-for i in range(len(hp_books) - 1):
-	hp_graph.add_edge(hp_books[i], hp_books[i+1], name='predecessor')
+hp_graph.add_nodes_from(hp_books.values())
+hp_graph.add_edge(hp_books['HP1_Harry_Potter_and_the_Philosophers_Stone'], hp_books['HP2_Harry_Potter_and_the_Chamber_of_Secrets'], name='predecessor')
+hp_graph.add_edge(hp_books['HP2_Harry_Potter_and_the_Chamber_of_Secrets'], hp_books['HP3_Harry_Potter_and_the_Prisoner_of_Azkaban'], name='predecessor')
+hp_graph.add_edge(hp_books['HP3_Harry_Potter_and_the_Prisoner_of_Azkaban'], hp_books['HP4_Harry_Potter_and_the_Goblet_of_Fire'], name='predecessor')
+hp_graph.add_edge(hp_books['HP4_Harry_Potter_and_the_Goblet_of_Fire'], hp_books['HP5_Harry_Potter_and_the_Order_of_the_Phoenix'], name='predecessor')
+hp_graph.add_edge(hp_books['HP5_Harry_Potter_and_the_Order_of_the_Phoenix'], hp_books['HP6_Harry_Potter_and_the_Half-Blood_Prince'], name='predecessor')
+hp_graph.add_edge(hp_books['HP6_Harry_Potter_and_the_Half-Blood_Prince'], hp_books['HP7_Harry_Potter_and_the_Deathly_Hallows'], name='predecessor')
 
 # Llibres de la saga del Senyor dels Anells
-lr_list: list[list[Union[str, int]]] = [
-	['LR1_The_Fellowship_of_the_Ring', 420],
-	['LR2_The_Two_Towers', 350],
-	['LR3_The_Return_of_the_King', 415]
-]
-lr_books: list[Book] = [Book(name=n, pages=p) for n, p in lr_list]
+lr_dict: dict = {
+	'LR1_The_Fellowship_of_the_Ring': 420,
+	'LR2_The_Two_Towers': 350,
+	'LR3_The_Return_of_the_King': 415
+}
+lr_books: dict = {n: Book(name=n, pages=p) for n, p in lr_dict.items()}
 lr_graph = nx.DiGraph()
-lr_graph.add_nodes_from(lr_books)
-for i in range(len(lr_books) - 1):
-	lr_graph.add_edge(lr_books[i], lr_books[i+1], name='predecessor')
+lr_graph.add_nodes_from(lr_books.values())
+lr_graph.add_edge(lr_books['LR1_The_Fellowship_of_the_Ring'], lr_books['LR2_The_Two_Towers'], name='predecessor')
+lr_graph.add_edge(lr_books['LR2_The_Two_Towers'], lr_books['LR3_The_Return_of_the_King'], name='predecessor')
 
 # Llibres de la saga dels Jocs de la Fam
-hg_list: list[list[Union[str, int]]] = [
-	['HG1_The_Hunger_Games', 370],
-	['HG2_Catching_Fire', 390],
-	['HG3_Mockingjay', 390]
-]
-hg_books: list[Book] = [Book(name=n, pages=p) for n, p in hg_list]
+hg_dict: dict = {
+	'HG1_The_Hunger_Games': 370,
+	'HG2_Catching_Fire': 390,
+	'HG3_Mockingjay': 390
+}
+hg_books: dict = {n: Book(name=n, pages=p) for n, p in hg_dict.items()}
 hg_graph = nx.DiGraph()
+hg_graph.add_nodes_from(hg_books.values())
+hg_graph.add_edge(hg_books['HG1_The_Hunger_Games'], hg_books['HG2_Catching_Fire'], name='predecessor')
+hg_graph.add_edge(hg_books['HG2_Catching_Fire'], hg_books['HG3_Mockingjay'], name='predecessor')
 
-for i in range(len(hg_books) - 1):
-	hg_graph.add_edge(hg_books[i], hg_books[i+1], name='predecessor')
+# Llibres inventats de la saga Marvel
+mv_dict: dict = {
+	'Avengers_1': 200,
+	'Avengers_2': 250,
+	'Avengers_3': 250,
+	'Ironman': 300,
+	'Hulk': 250,
+	'Captain_America': 350,
+	'Thor': 400,
+	'Black_Widow': 300,
+	'Hawkeye': 250,
+	'Spiderman_1': 250,
+	'Spiderman_2': 300,
+	'Guardians_of_the_Galaxy_1': 300,
+	'Guardians_of_the_Galaxy_2': 200,
+	'Guardians_of_the_Galaxy_3': 250,
+	'Groot': 200,
+}
+mv_books: dict = {n: Book(name=n, pages=p) for n, p in mv_dict.items()}
+mv_graph = nx.DiGraph()
+mv_graph.add_nodes_from(mv_books.values())
+mv_graph.add_edge(mv_books['Avengers_1'], mv_books['Avengers_2'], name='predecessor')
+mv_graph.add_edge(mv_books['Avengers_2'], mv_books['Avengers_3'], name='predecessor')
+mv_graph.add_edge(mv_books['Guardians_of_the_Galaxy_1'], mv_books['Guardians_of_the_Galaxy_2'], name='predecessor')
+mv_graph.add_edge(mv_books['Guardians_of_the_Galaxy_2'], mv_books['Guardians_of_the_Galaxy_3'], name='predecessor')
+mv_graph.add_edge(mv_books['Spiderman_1'], mv_books['Spiderman_2'], name='predecessor')
+mv_graph.add_edge(mv_books['Avengers_1'], mv_books['Ironman'], name='parallel')
+mv_graph.add_edge(mv_books['Avengers_1'], mv_books['Hulk'], name='parallel')
+mv_graph.add_edge(mv_books['Avengers_1'], mv_books['Captain_America'], name='parallel')
+mv_graph.add_edge(mv_books['Avengers_1'], mv_books['Thor'], name='parallel')
+mv_graph.add_edge(mv_books['Avengers_1'], mv_books['Black_Widow'], name='parallel')
+mv_graph.add_edge(mv_books['Avengers_1'], mv_books['Hawkeye'], name='parallel')
+mv_graph.add_edge(mv_books['Groot'], mv_books['Guardians_of_the_Galaxy_1'], name='parallel')
 
 # Més preguntes a l'usuari
 while True:
+	set_strings_sagas: set[str] = {'HP', 'hp', 'LR', 'lr', 'HG', 'hg', 'HELP', 'help', ''} if level < 2 else {'HP', 'hp', 'LR', 'lr', 'HG', 'hg', 'MV', 'mv', 'HELP', 'help', ''}
+	options_str: str = 'HP/LR/HG/HELP' if level < 2 else 'HP/LR/HG/MV/HELP'
 	try:
-		books_list: list[str] = input("Introdueix les paraules clau de les sagues famoses de llibres separades per comes. Deixa-ho en blanc (buit) si no en vols incloure cap. (HELP per més informació) [HP/LR/HG/HELP]:\n").replace(' ', '').split(',')
+		books_list: list[str] = input(f"Introdueix les paraules clau de les sagues famoses de llibres separades per comes. Deixa-ho en blanc (buit) si no en vols incloure cap. (HELP per més informació) [{options_str}]:\n").replace(' ', '').split(',')
 		for string in books_list:
-			if string not in {'HP', 'LR', 'HG', 'HELP', 'help', ''}:
+			if string not in set_strings_sagas:
 				raise ValueError
 		if len(books_list) == 1 and books_list[0] in {'HELP', 'help'}:
-			print(f"Pots escriure les següents paraules clau per incloure sagues famoses de llibres:\n\t* HP per incloure tots els 7 llibres de Harry Potter.\n\t* LR per incloure tots els 3 llibres del Senyor dels Anells (The Lord of the Rings).\n\t* HG per incloure tots els 3 llibres de la saga dels Jocs de la Fam (Hunger Games).")
+			print(f"Pots escriure les següents paraules clau per incloure sagues famoses de llibres:\n\t* HP per incloure tots els {len(hp_books)} llibres de Harry Potter.\n\t* LR per incloure tots els {len(lr_books)} llibres del Senyor dels Anells (The Lord of the Rings).\n\t* HG per incloure tots els {len(hg_books)} llibres de la saga dels Jocs de la Fam (Hunger Games).")
+			if level >= 2:
+				print(f"\t* MV per incloure tots els {len(mv_books)} llibres inventats de la saga Marvel.")
 			continue
 		else:
-			if 'HP' in books_list:
+			if 'HP' in books_list or 'hp' in books_list:
 				for i, test_graph in enumerate(graphs):
 					graphs[i] = nx.union(test_graph, hp_graph)
-			if 'LR' in books_list:
+			if 'LR' in books_list or 'lr' in books_list:
 				for i, test_graph in enumerate(graphs):
 					graphs[i] = nx.union(test_graph, lr_graph)
-			if 'HG' in books_list:
+			if 'HG' in books_list or 'hg' in books_list:
 				for i, test_graph in enumerate(graphs):
 					graphs[i] = nx.union(test_graph, hg_graph)
+			if 'MV' in books_list or 'mv' in books_list:
+				for i, test_graph in enumerate(graphs):
+					graphs[i] = nx.union(test_graph, mv_graph)
 	except ValueError:
 		print("Error: Els valors no són vàlids. Introdueix només un els següents valors: HP, LR, HG, HELP.")
 		continue
@@ -362,10 +407,6 @@ for i in range(n_tests):
 				for n in group:
 					if n != group_root:
 						file.write(f'\t\t(parallel {group_root} {n})\n')
-
-			for e in graphs[i].edges:
-				if graphs[i].edges[e]['name'] == 'parallel':
-					file.write(f'\t\t(parallel {e[0]} {e[1]})\n')
 
 		# Goal books
 		file.write('\t\t;;Books the user would like to read\n')
