@@ -55,28 +55,32 @@ def add_edge_if_no_cycle(graph: nx.DiGraph, u: Book, v: Book, edge_name: str, cy
 		print(f"\t* Aresta {edge_name.capitalize()}({u} -> {v}) afegida correctament.")
 		return True
 	
-def parallel_nodes_in_component(graph: nx.DiGraph, initial_node: Book) -> set[Book]:
+import networkx as nx
+
+def parallel_chained_nodes(graph: nx.DiGraph, initial_node: Book) -> set[Book]:
 	"""
-	Retorna el conjunt de nodes que formen part del component connex format només per arestes de tipus 'parallel' que conté el node inicial.
+	Retorna el conjunt de nodes que formen part de la mateixa 'cadena' formada
+	només per arestes de tipus 'parallel' que conté el node inicial.
 	"""
-	assert graph.number_of_nodes() > 0, "El graf no pot ser buit."
+	assert graph.number_of_nodes() > 0, "El graf no pot estar buit."
 	assert graph.has_node(initial_node), "El node inicial ha d'estar en el graf."
-	
-	# Trobar el component connex que conté el node inicial
-	for component in nx.weakly_connected_components(graph):
-		if initial_node in component:
-			
-			break
 
-	# Buscar arestes amb name='parallel' en el component connex
-	selected_nodes = set()
-	for u, v, attr in graph.edges(data=True):
-		if u in component and v in component and attr.get('name') == 'parallel':
-			selected_nodes.add(u)
-			selected_nodes.add(v)
+	parallel_chain = set()
+	parallel_chain.add(initial_node)
 
-	print(selected_nodes)
-	return selected_nodes
+	# Funció auxiliar per recórrer el graf de manera recursiva
+	def recursive(node: Book):
+		for neighbor in graph.neighbors(node):
+			if neighbor not in parallel_chain and \
+			   ('parallel' in [graph.get_edge_data(node, neighbor, {}).get('name', ''),
+								graph.get_edge_data(neighbor, node, {}).get('name', '')]):
+				parallel_chain.add(neighbor)
+				recursive(neighbor)
+
+	recursive(initial_node)
+
+	return parallel_chain
+
 
 # Nivell d'extensió dels jocs de proves
 while True:
@@ -283,14 +287,14 @@ for i, test_graph in enumerate(graphs):
 						if tmp_parallel != b:
 							break
 					# Comprova que la suma de les pàgines dels llibres paral·lels no superi les 1600 pàgines (2 mesos amb un màxim de 800 pàgines cada mes)
-					# En el mateix component connex
-					if parallel_nodes_in_component(graph=test_graph, initial_node=b).union({b}) == parallel_nodes_in_component(graph=test_graph, initial_node=tmp_parallel).union({tmp_parallel}):
-						if sum(p.pages for p in parallel_nodes_in_component(graph=test_graph, initial_node=b)) + b.pages <= 1600:
+					# En el matex grup de parallels
+					if parallel_chained_nodes(graph=test_graph, initial_node=b) == parallel_chained_nodes(graph=test_graph, initial_node=tmp_parallel):
+						if sum(p.pages for p in parallel_chained_nodes(graph=test_graph, initial_node=b)) + tmp_parallel.pages <= 1600:
 							add_edge_if_no_cycle(graph=test_graph, u=tmp_parallel, v=b, edge_name='parallel', cycle_type='undirected')
-					# En components connexos diferents
+					# En grups de parallels diferents
 					else:
 						if tmp_parallel not in test_graph.neighbors(b) \
-							and (sum(p1.pages for p1 in parallel_nodes_in_component(graph=test_graph, initial_node=b)) + sum(p2.pages for p2 in parallel_nodes_in_component(graph=test_graph, initial_node=tmp_parallel))) <= 1600:
+							and (sum(p1.pages for p1 in parallel_chained_nodes(graph=test_graph, initial_node=b)) + sum(p2.pages for p2 in parallel_chained_nodes(graph=test_graph, initial_node=tmp_parallel))) <= 1600:
 							add_edge_if_no_cycle(graph=test_graph, u=tmp_parallel, v=b, edge_name='parallel', cycle_type='undirected')
 
 # Mostra els grafs de cada joc de proves
