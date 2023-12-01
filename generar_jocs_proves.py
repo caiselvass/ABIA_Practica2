@@ -223,24 +223,9 @@ while True:
 
 while True:
 	try:
-		max_addi_books: int = int(input("Introdueix el nombre màxim de llibres addicionals que vols generar per cada joc de proves: ").replace(' ', ''))
-		if max_addi_books < 0:
-			raise ValueError
-		else:
-			if max_addi_books == 0:
-				num_addi_books_list: list[int] = [0 for _ in range(n_tests)]
-			else:
-				while True:
-					try:
-						seed: Union[int, None] = int(input("Introdueix la llavor per generar aleatòriament diferents nombres de llibres addicionals per cada joc de proves (0 per triar una llavor qualsevol): ").replace(' ', ''))
-						if seed == 0:
-							seed = None
-							np.random.seed(seed)
-					except ValueError:
-						print("Error: Introdueix un nombre enter.")
-						continue
-					break
-				num_addi_books_list: list[int] = [np.random.randint(1, max_addi_books + 1) for _ in range(n_tests)]				
+		num_addi_books: int = int(input("Introdueix el nombre de llibres addicionals que vols generar en els joc de proves: ").replace(' ', ''))
+		if num_addi_books < 0:
+			raise ValueError		
 	except ValueError:
 		print("Error: Introdueix un nombre enter >= 0.")
 		continue
@@ -248,7 +233,6 @@ while True:
 
 # Generació dels grafs per cada joc de proves
 for i, test_graph in enumerate(graphs):
-	num_addi_books: int = num_addi_books_list[i]
 	print(f"\nJOC DE PROVES [{i+1}] --> {num_addi_books} llibres addicionals afegits.")
 	
 	# Afegir llibres addicionals (només en cas que n'hi hagi)
