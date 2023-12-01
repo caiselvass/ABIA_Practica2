@@ -290,7 +290,6 @@ for i, test_graph in enumerate(graphs):
 								break
 						add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
 				
-				for j, b in enumerate(tmp_addi_books):
 					while True:
 						tmp_parallel: Book = np.random.choice(np.array(tmp_addi_books))
 						if tmp_parallel != b:
@@ -309,7 +308,6 @@ for i, test_graph in enumerate(graphs):
 								break
 						add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
 				
-				for j, b in enumerate(tmp_addi_books):
 					while True:
 						tmp_parallel: Book = np.random.choice(np.array(tmp_addi_books))
 						if tmp_parallel != b:
