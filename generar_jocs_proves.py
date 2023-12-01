@@ -335,7 +335,7 @@ for i, test_graph in enumerate(graphs):
 	plt.show()
 
 # Generació dels jocs de proves
-for i in range(n_tests):
+for i, test_graph in enumerate(graphs):
 	with open(f'./problems/generated_problem_ext_{level}_{i+1}.pddl', 'w') as file:
 		print(f"S'ha generat el fitxer 'generated_problem_ext_{level}_{i+1}.pddl' en el directori 'problems' amb el joc de proves {i+1}.")
 
@@ -343,7 +343,7 @@ for i in range(n_tests):
 		file.write(f'(define (problem reading_plan_problem_ext_{level}_{i+1})\n\t(:domain reading_plan)\n')
 
 		# OBJECTS
-		books_str = ' '.join(list(str(n) for n in graphs[i].nodes))
+		books_str = ' '.join(list(str(n) for n in test_graph.nodes))
 		months = 'Past January February March April May June July August September October November December'
 		file.write(f'\t;;Objects\n\t(:objects\n\t\t{months} - month\n\t\t{books_str} - book\n\t)\n')
 
@@ -364,22 +364,22 @@ for i in range(n_tests):
 
 		# Predecessors
 		file.write('\t\t;;Predecessos\n')
-		for e in graphs[i].edges:
-			if graphs[i].edges[e]['name'] == 'predecessor':
+		for e in test_graph.edges:
+			if test_graph.edges[e]['name'] == 'predecessor':
 				file.write(f'\t\t(predecessor {e[0]} {e[1]})\n')
 		
 		# Goal books 
-		goal_books: set = set(np.random.choice(list(graphs[i].nodes), size=np.random.randint(1, len(list(graphs[i].nodes)) + 1), replace=False))
+		goal_books: set = set(np.random.choice(list(test_graph.nodes), size=np.random.randint(1, len(list(test_graph.nodes)) + 1), replace=False))
 		
 		if level >= 2:
 			# Parallels
 			parallel_groups = {}
 			file.write('\t\t;;Parallels\n')
-			for n in set(graphs[i].nodes):
-				if tuple(parallel_chained_nodes(graph=graphs[i], initial_node=n)) in parallel_groups.keys():
-					parallel_groups[tuple(parallel_chained_nodes(graph=graphs[i], initial_node=n))].add(n)
+			for n in set(test_graph.nodes):
+				if tuple(parallel_chained_nodes(graph=test_graph, initial_node=n)) in parallel_groups.keys():
+					parallel_groups[tuple(parallel_chained_nodes(graph=test_graph, initial_node=n))].add(n)
 				else:
-					parallel_groups[tuple(parallel_chained_nodes(graph=graphs[i], initial_node=n))] = {n}
+					parallel_groups[tuple(parallel_chained_nodes(graph=test_graph, initial_node=n))] = {n}
 			
 			for group in parallel_groups.values():
 				group_root = list(group)[0]
@@ -398,7 +398,7 @@ for i in range(n_tests):
 			file.write(f'\t\t(goal_book {b})\n')
 
 		# Read books
-		remaining_books: set = set(graphs[i].nodes) - goal_books
+		remaining_books: set = set(test_graph.nodes) - goal_books
 		num_remaining_books: int = len(remaining_books)
 		file.write('\t\t;;Books the user has already read\n')
 		for b in set(np.random.choice(list(remaining_books), size=np.random.randint(min(1, num_remaining_books), num_remaining_books + 1), replace=False)):
@@ -409,7 +409,7 @@ for i in range(n_tests):
 		if level == 3:
 			# Book pages
 			file.write('\t\t;;Book pages\n')
-			for n in graphs[i].nodes:
+			for n in test_graph.nodes:
 				file.write(f'\t\t(= (total_pages {n}) {n.pages})\n')
 			
 			# Initial pages read per month
