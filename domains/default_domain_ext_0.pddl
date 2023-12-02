@@ -1,5 +1,5 @@
 (define (domain reading_plan)
-    (:requirements :strips :typing :equality :conditional-effects)
+    (:requirements :strips)
 
     ;; Types
     (:types
@@ -12,7 +12,6 @@
         (predecessor ?b1 - book ?b2 - book)
         (goal_book ?b - book) ; New predicate for goal books
         (assigned ?b - book ?m - month)
-        (month_finished ?m - month)
         (current_month ?m - month)
         (next_month ?m1 - month ?m2 - month)
         (previous_month ?m - month)
@@ -46,7 +45,6 @@
             (next_month ?actualm ?nextm)
         )
         :effect (and
-            (month_finished ?actualm)
             (not (current_month ?actualm))
             (current_month ?nextm)
             (previous_month ?actualm)
