@@ -1,5 +1,5 @@
 (define (domain reading_plan)
-    (:requirements :strips :typing :negative-preconditions :disjunctive-preconditions :existential-preconditions)
+    (:requirements :typing :negative-preconditions :existential-preconditions :disjunctive-preconditions)
 
     ;; Types
     (:types
