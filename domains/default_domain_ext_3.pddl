@@ -1,4 +1,6 @@
 (define (domain reading_plan)
+    (:requirements :strips :typing :negative-preconditions :disjunctive-preconditions :existential-preconditions :numeric-fluents)
+
     ;; Types
     (:types
         book month - object
