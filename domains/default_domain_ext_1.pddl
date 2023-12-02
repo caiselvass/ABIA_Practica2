@@ -1,6 +1,4 @@
 (define (domain reading_plan)
-    (:requirements :strips)
-
     ;; Types
     (:types
         book month - object
