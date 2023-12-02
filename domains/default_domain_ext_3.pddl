@@ -37,7 +37,7 @@
             ;; The predecessors must have been read before the book's month
             (forall (?pre - book) (imply (predecessor ?pre ?b) (and (read ?pre) (not (assigned ?pre ?actualm)))))
             ;; The parallel books must be a goal to be read before the book's month or in the same month
-            (forall (?par - book) (imply (parallel ?b ?par) (or (assigned ?par ?actualm) (assigned ?par ?prevm))))
+            (forall (?par - book) (imply (and (parallel ?b ?par) (not (assigned ?par Past))) (or (assigned ?par ?actualm) (assigned ?par ?prevm))))
 
             (<= (+ (pages_read ?actualm) (total_pages ?b)) 800)
         )

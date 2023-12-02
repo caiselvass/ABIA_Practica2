@@ -398,7 +398,7 @@ for i, test_graph in enumerate(graphs):
 			file.write(f'\t\t(goal_book {b})\n')
 
 		# Read books
-		remaining_books: set = set(test_graph.nodes) - goal_books
+		remaining_books: set = set(test_graph.nodes) - goal_books # No podem haver llegit llibres que ens volem llegir en un futur (seria una contradicció)
 		num_remaining_books: int = len(remaining_books)
 		file.write('\t\t;;Books the user has already read\n')
 		for b in set(np.random.choice(list(remaining_books), size=np.random.randint(min(1, num_remaining_books), num_remaining_books + 1), replace=False)):
