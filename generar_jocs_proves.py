@@ -7,7 +7,7 @@ import os
 
 # Comprovació de la correcta instal·lació del planner per MacOS
 def correct_compilation_on_mac():
-    return os.path.isfile('./executables/macos/ff.h')
+    return os.path.isfile('./executables/macos/ff')
 
 # Definició de classe Book
 class Book:
