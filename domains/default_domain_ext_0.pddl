@@ -27,7 +27,7 @@
             (previous_month ?prevm)
             ;; The predecessors must have been read before the book's month
             (or (not (exists (?pre - book) (predecessor ?pre ?b))) 
-                (and (exists (?pre - book) (predecessor ?pre ?b)) (read ?pre) (not (assigned ?pre ?actualm))))
+                (exists (?pre - book) (and (predecessor ?pre ?b) (read ?pre) (not (assigned ?pre ?actualm)))))
         )
         :effect (and
             (read ?b)
