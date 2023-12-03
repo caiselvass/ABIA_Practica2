@@ -450,24 +450,23 @@ if execute_planner:
 	# Optimitzar el nombre de mesos
 	optimize_months: Union[bool, str] = False
 	
-	if level == 3:
-		while True:
-			try:
-				optimize_months = input("Vols aplicar l'optimitzador de nombre de mesos? (HELP per més informació) [Y/N/HELP]: ").replace(' ', '')
-				if optimize_months not in {'Y', 'y', 'N', 'n', 'HELP', 'help'}:
-					raise ValueError
+	while True:
+		try:
+			optimize_months = input("Vols aplicar l'optimitzador de nombre de mesos? (HELP per més informació) [Y/N/HELP]: ").replace(' ', '')
+			if optimize_months not in {'Y', 'y', 'N', 'n', 'HELP', 'help'}:
+				raise ValueError
+			else:
+				if optimize_months in {'HELP', 'help'}:
+					print("L'optimitzador de nombre de mesos afegeix el flag '-O' a l'execució. D'aquesta manera es garantitza que el nombre de mesos que es generen en el plan sigui el mínim possible, però el cost computacional és considerablement més alt.")
+					continue
+				elif optimize_months in {'Y', 'y'}:
+					optimize_months = True
 				else:
-					if optimize_months in {'HELP', 'help'}:
-						print("L'optimitzador de nombre de mesos afegeix el flag '-O' a l'execució. D'aquesta manera es garantitza que el nombre de mesos que es generen en el plan sigui el mínim possible, però el cost computacional és considerablement més alt.")
-						continue
-					elif optimize_months in {'Y', 'y'}:
-						optimize_months = True
-					else:
-						optimize_months = False
-			except ValueError:
-				print("Error: Introdueix només un dels següents valors: Y, N, HELP.")
-				continue
-			break
+					optimize_months = False
+		except ValueError:
+			print("Error: Introdueix només un dels següents valors: Y, N, HELP.")
+			continue
+		break
 
 	# Execució del planner
 	import platform #Per saber si estem a Windows, Linux o MacOS
