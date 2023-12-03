@@ -222,28 +222,48 @@ while True:
 		continue
 	break
 
+# Nombre de llibres addicionals
 while True:
 	try:
 		num_addi_books: int = int(input("Introdueix el nombre de llibres addicionals que vols generar en els joc de proves: ").replace(' ', ''))
 		if num_addi_books < 0:
 			raise ValueError
-		elif num_addi_books > 1:
-			while True:
-				try:
-					seed: Union[None, int] = int(input("Introdueix la llavor (seed) per generar les relacions entre els llibres addicionals (0 per triar una llavor qualsevol): ").replace(' ', ''))
-					if seed < 0:
-						raise ValueError
-					elif seed == 0:
-						seed = None
-					np.random.seed(seed)
-					break
-				except ValueError:
-					print("Error: Introdueix un nombre enter >= 0.")
-					continue
 	except ValueError:
 		print("Error: Introdueix un nombre enter >= 0.")
 		continue
 	break
+
+# Llegir tots els llibres o que sigui aleatori
+while True:
+	try:
+		read_all_books: Union[bool, str] = input("Vols llegir tots els llibres possibles o que siguin triats aleatòriament? [ALL/R]: ").replace(' ', '')
+		if read_all_books not in {'ALL', 'all', 'R', 'r'}:
+			raise ValueError
+		else:
+			if read_all_books in {'ALL', 'all'}:
+				read_all_books = True
+			else:
+				read_all_books = False
+	except ValueError:
+		print("Error: Introdueix només un dels següents valors: ALL, R.")
+		continue
+	break
+
+# Llavor (seed) per generar les relacions entre els llibres addicionals
+if (not read_all_books) or (num_addi_books > 1):
+	while True:
+		try:
+			seed: Union[None, int] = int(input("Introdueix la llavor (seed) per realitzar els processos aleatoris (0 per triar una llavor qualsevol): ").replace(' ', ''))
+			if seed < 0:
+				raise ValueError
+			elif seed == 0:
+				seed = None
+			np.random.seed(seed)
+		
+		except ValueError:
+			print("Error: Introdueix un nombre enter >= 0.")
+			continue
+		break
 
 # Generació dels grafs per cada joc de proves
 for i, test_graph in enumerate(graphs):
@@ -378,8 +398,11 @@ for i, test_graph in enumerate(graphs):
 			if test_graph.edges[e]['name'] == 'predecessor':
 				file.write(f'\t\t(predecessor {e[0]} {e[1]})\n')
 		
-		# Goal books 
-		goal_books: set = set(np.random.choice(list(test_graph.nodes), size=np.random.randint(1, len(list(test_graph.nodes)) + 1), replace=False))
+		# Goal books
+		if read_all_books:
+			goal_books: set = set(test_graph.nodes)
+		else:
+			goal_books: set = set(np.random.choice(list(test_graph.nodes), size=np.random.randint(1, len(list(test_graph.nodes)) + 1), replace=False))
 		
 		if level >= 2:
 			# Parallels
@@ -408,12 +431,13 @@ for i, test_graph in enumerate(graphs):
 			file.write(f'\t\t(goal_book {b})\n')
 
 		# Read books
-		remaining_books: set = set(test_graph.nodes) - goal_books # No podem haver llegit llibres que ens volem llegir en un futur (seria una contradicció)
-		num_remaining_books: int = len(remaining_books)
-		file.write('\t\t;;Books the user has already read\n')
-		for b in set(np.random.choice(list(remaining_books), size=np.random.randint(min(1, num_remaining_books), num_remaining_books + 1), replace=False)):
-			file.write(f'\t\t(read {b})\n')
-			file.write(f'\t\t(assigned {b} Past)\n')
+		if not read_all_books:
+			remaining_books: set = set(test_graph.nodes) - goal_books # No podem haver llegit llibres que ens volem llegir en un futur (seria una contradicció)
+			num_remaining_books: int = len(remaining_books)
+			file.write('\t\t;;Books the user has already read\n')
+			for b in set(np.random.choice(list(remaining_books), size=np.random.randint(min(1, num_remaining_books), num_remaining_books + 1), replace=False)):
+				file.write(f'\t\t(read {b})\n')
+				file.write(f'\t\t(assigned {b} Past)\n')
 
 		if level == 3:
 			# Book pages
