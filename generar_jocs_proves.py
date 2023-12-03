@@ -276,7 +276,7 @@ for i, test_graph in enumerate(graphs):
 			if level == 3:
 				while True:
 					tmp_pages: int = int(np.random.normal(275, 100))
-					if 10 <= tmp_pages <= 800:
+					if 15 <= tmp_pages <= 800:
 						break
 			
 				tmp_book: Book = Book(f'Book_{b+1}', tmp_pages)
