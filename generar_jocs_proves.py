@@ -500,24 +500,24 @@ if execute_planner:
 			if optimize_months:
 				with open(f'./results/opt_reading_plan_{i+1}.txt', 'w') as result_file:
 					execution = subprocess.run(['powershell', f'./executables/windows/metricff -O -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=result_file)
-					print(f"\t* S'ha generat el fitxer 'opt_reading_plan.txt_{i+1}' en el directori 'results' amb el resultat de l'execució del planner.")
+					print(f"\t* S'ha generat el fitxer 'opt_reading_plan_{i+1}.txt' en el directori 'results' amb el resultat de l'execució del planner.")
 			else:
 				with open(f'./results/reading_plan_{i+1}.txt', 'w') as result_file:
 					execution = subprocess.run(['powershell', f'./executables/windows/metricff -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=result_file)
-					print(f"\t* S'ha generat el fitxer 'reading_plan.txt_{i+1}' en el directori 'results' amb el resultat de l'execució del planner.")
+					print(f"\t* S'ha generat el fitxer 'reading_plan_{i+1}.txt' en el directori 'results' amb el resultat de l'execució del planner.")
 	
 	# MacOS
 	elif operative_system == 'Darwin':
 		# Ejecutar el script de compilació del planner en cas que no estigui compilat
 		if not correct_compilation_on_mac():
-			subprocess.run(['./executables/macos/make ff'])
+			subprocess.run('cd ./executables/macos && make ff', shell=True)
 		
 		for i in range(n_tests):
 			if optimize_months:
 				with open(f'./results/opt_reading_plan_{i+1}.txt', 'w') as result_file:
 					execution = subprocess.run([f'./executables/macos/ff -O -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=result_file)
-					print(f"\t* S'ha generat el fitxer 'opt_reading_plan.txt_{i+1}' en el directori 'results' amb el resultat de l'execució del planner.")
+					print(f"\t* S'ha generat el fitxer 'opt_reading_plan_{i+1}.txt' en el directori 'results' amb el resultat de l'execució del planner.")
 			else:
 				with open(f'./results/reading_plan_{i+1}.txt', 'w') as result_file:
 					execution = subprocess.run([f'./executables/macos/ff -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=result_file)
-					print(f"\t* S'ha generat el fitxer 'reading_plan.txt_{i+1}' en el directori 'results' amb el resultat de l'execució del planner.")
+					print(f"\t* S'ha generat el fitxer 'reading_plan{i+1}.txt' en el directori 'results' amb el resultat de l'execució del planner.")
