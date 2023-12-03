@@ -46,4 +46,7 @@
             (forall (?b - book) (imply (goal_book ?b) (read ?b)))
         )
     )
+
+    ;; Optimize the number of months
+    (:metric minimize (num_months_created))
 )

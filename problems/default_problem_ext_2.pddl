@@ -47,4 +47,6 @@
         )
     )
 
+    ;; Optimize the number of months
+    (:metric minimize (num_months_created))
 )
