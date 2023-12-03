@@ -420,9 +420,8 @@ for i, test_graph in enumerate(graphs):
 		file.write('\t\t(and\n')
 		file.write('\t\t\t(forall (?b - book) (imply (goal_book ?b) (read ?b)))\n\t\t)\n\t)\n')
 
-		if level == 3:
-			# METRICS
-			file.write('\t;;Optimize the number of months\n\t(:metric minimize (num_months_created))\n')
+		# METRICS
+		file.write('\t;;Optimize the number of months\n\t(:metric minimize (num_months_created))\n')
 
 		# FOOTER
 		file.write(')')
