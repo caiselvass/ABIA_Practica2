@@ -309,12 +309,8 @@ for i, test_graph in enumerate(graphs):
 						if tmp_parallel != b:
 							break
 					# Comprova que la suma de les pàgines dels llibres paral·lels no superi les 1600 pàgines (2 mesos amb un màxim de 800 pàgines cada mes)
-					# En el matex grup de parallels
-					if parallel_chained_nodes(graph=test_graph, initial_node=b) == parallel_chained_nodes(graph=test_graph, initial_node=tmp_parallel):
-						if sum(p.pages for p in parallel_chained_nodes(graph=test_graph, initial_node=b)) + tmp_parallel.pages <= 1600:
-							add_edge_if_no_cycle(graph=test_graph, u=tmp_parallel, v=b, edge_name='parallel', cycle_type='undirected')
-					# En grups de parallels diferents
-					else:
+					# Comprova que estiguin en un grup de paral·lels diferent. Si estan en el mateix grup, no cal afegir l'aresta perquè ja són paral·lels.
+					if parallel_chained_nodes(graph=test_graph, initial_node=b) != parallel_chained_nodes(graph=test_graph, initial_node=tmp_parallel):
 						if tmp_parallel not in test_graph.neighbors(b) \
 							and (sum(p1.pages for p1 in parallel_chained_nodes(graph=test_graph, initial_node=b)) + sum(p2.pages for p2 in parallel_chained_nodes(graph=test_graph, initial_node=tmp_parallel))) <= 1600:
 							add_edge_if_no_cycle(graph=test_graph, u=tmp_parallel, v=b, edge_name='parallel', cycle_type='undirected')
