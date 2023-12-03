@@ -520,4 +520,4 @@ if execute_planner:
 			else:
 				with open(f'./results/reading_plan_{i+1}.txt', 'w') as result_file:
 					execution = subprocess.run([f'./executables/macos/ff -o ./domains/default_domain_ext_{level}.pddl -f ./problems/generated_problem_ext_{level}_{i+1}.pddl'], shell=True, stdout=result_file)
-					print(f"\t* S'ha generat el fitxer 'reading_plan{i+1}.txt' en el directori 'results' amb el resultat de l'execució del planner.")
+					print(f"\t* S'ha generat el fitxer 'reading_plan_{i+1}.txt' en el directori 'results' amb el resultat de l'execució del planner.")
