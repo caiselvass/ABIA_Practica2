@@ -456,7 +456,7 @@ if execute_planner:
 				raise ValueError
 			else:
 				if optimize_months in {'HELP', 'help'}:
-					print("L'optimitzador de nombre de mesos afegeix el flag '-O' a l'execució. D'aquesta manera es garantitza que el nombre de mesos que es generen en el plan sigui el mínim possible, però el cost computacional és considerablement més alt.")
+					print("L'optimitzador de nombre de mesos afegeix el flag '-O' a l'execució. D'aquesta manera es garantitza que el nombre de mesos que es generen en el plan sigui el mínim possible, però el cost computacional i el temps d'execució són molt més alts.")
 					continue
 				elif optimize_months in {'Y', 'y'}:
 					optimize_months = True
