@@ -373,7 +373,7 @@ for i, test_graph in enumerate(graphs):
 		file.write('\t\t(previous_month Past)\n')
 
 		# Predecessors
-		file.write('\t\t;;Predecessos\n')
+		file.write('\t\t;;Predecessors\n')
 		for e in test_graph.edges:
 			if test_graph.edges[e]['name'] == 'predecessor':
 				file.write(f'\t\t(predecessor {e[0]} {e[1]})\n')
@@ -413,7 +413,6 @@ for i, test_graph in enumerate(graphs):
 		file.write('\t\t;;Books the user has already read\n')
 		for b in set(np.random.choice(list(remaining_books), size=np.random.randint(min(1, num_remaining_books), num_remaining_books + 1), replace=False)):
 			file.write(f'\t\t(read {b})\n')
-			file.write(f'\t\t(goal_book {b})\n')
 			file.write(f'\t\t(assigned {b} Past)\n')
 
 		if level == 3:
