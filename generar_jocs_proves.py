@@ -49,14 +49,10 @@ def add_edge_if_no_cycle(graph: nx.DiGraph, u: Book, v: Book, edge_name: str, cy
 	"""
 	if has_cycle(graph, u, v, cycle_type=cycle_type):
 		print(f"\t* L'aresta P{edge_name[1:]}({u} -> {v}) crearia un cicle. No s'ha afegit.")
-		return False
 	else:
 		graph.add_edge(u, v, name=edge_name)
 		print(f"\t* Aresta {edge_name.capitalize()}({u} -> {v}) afegida correctament.")
-		return True
 	
-import networkx as nx
-
 def parallel_chained_nodes(graph: nx.DiGraph, initial_node: Book) -> set[Book]:
 	"""
 	Retorna el conjunt de nodes que formen part de la mateixa 'cadena' formada
