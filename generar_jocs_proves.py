@@ -113,7 +113,7 @@ hp_dict: dict = {
 	'HP2_Harry_Potter_and_the_Chamber_of_Secrets': 250,
 	'HP3_Harry_Potter_and_the_Prisoner_of_Azkaban': 315,
 	'HP4_Harry_Potter_and_the_Goblet_of_Fire': 635,
-	'HP5_Harry_Potter_and_the_Order_of_the_Phoenix': 765,
+	'HP5_Harry_Potter_and_the_Order_of_the_Phoenix': 800,
 	'HP6_Harry_Potter_and_the_Half-Blood_Prince': 600,
 	'HP7_Harry_Potter_and_the_Deathly_Hallows': 600
 }
