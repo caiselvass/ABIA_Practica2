@@ -221,7 +221,20 @@ while True:
 	try:
 		num_addi_books: int = int(input("Introdueix el nombre de llibres addicionals que vols generar en els joc de proves: ").replace(' ', ''))
 		if num_addi_books < 0:
-			raise ValueError		
+			raise ValueError
+		elif num_addi_books > 1:
+			while True:
+				try:
+					seed: Union[None, int] = int(input("Introdueix la llavor (seed) per generar les relacions entre els llibres addicionals (0 per triar una llavor qualsevol): ").replace(' ', ''))
+					if seed < 0:
+						raise ValueError
+					elif seed == 0:
+						seed = None
+					np.random.seed(seed)
+					break
+				except ValueError:
+					print("Error: Introdueix un nombre enter >= 0.")
+					continue
 	except ValueError:
 		print("Error: Introdueix un nombre enter >= 0.")
 		continue
