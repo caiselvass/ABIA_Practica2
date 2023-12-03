@@ -3,6 +3,11 @@ import numpy as np
 import networkx as nx
 from typing import Union
 import matplotlib.pyplot as plt
+import os
+
+# Comprovació de la correcta instal·lació del planner per MacOS
+def correct_compilation_on_mac():
+    return os.path.isfile('./executables/macos/ff.h')
 
 # Definició de classe Book
 class Book:
@@ -503,6 +508,10 @@ if execute_planner:
 	
 	# MacOS
 	elif operative_system == 'Darwin':
+		# Ejecutar el script de compilació del planner en cas que no estigui compilat
+		if not correct_compilation_on_mac():
+			subprocess.run(['./executables/macos/make ff'])
+		
 		for i in range(n_tests):
 			if optimize_months:
 				with open(f'./results/opt_reading_plan_{i+1}.txt', 'w') as result_file:
