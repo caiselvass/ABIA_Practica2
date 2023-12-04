@@ -52,11 +52,9 @@ def add_edge_if_no_cycle(graph: nx.DiGraph, u: Book, v: Book, edge_name: str, cy
 	"""
 	Afegeix l'aresta (u, v) al graf si no crea un cicle.
 	"""
-	if has_cycle(graph, u, v, cycle_type=cycle_type):
-		print(f"\t* L'aresta P{edge_name[1:]}({u} -> {v}) crearia un cicle. No s'ha afegit.")
-	else:
+	if not has_cycle(graph, u, v, cycle_type=cycle_type):
 		graph.add_edge(u, v, name=edge_name)
-		print(f"\t* Aresta {edge_name.capitalize()}({u} -> {v}) afegida correctament.")
+		print(f"\t* Aresta {edge_name.capitalize()}({u} -> {v}) afegida correctament (el graf no conté cicles).")
 	
 def parallel_chained_nodes(graph: nx.DiGraph, initial_node: Book) -> set[Book]:
     assert graph.number_of_nodes() > 0, "El graf no pot estar buit."
@@ -282,11 +280,15 @@ for i, test_graph in enumerate(graphs):
 		
 		# Afegir les arestes (predecessor/parallel) als llibres addicionals (només en cas que n'hi hagi més d'un) 
 		if num_addi_books > 1:
+			added_edges: list[int] = [0 for _ in range(n_tests)]
+
 			if level == 0:
 				# "Nivel básico: En el plan de lectura todos los libros tienen 0 o 1 predecesores y ningún paralelo.
 				# El planner es capaz de encontrar un plan para poder llegar a leer los libros objetivo encadenando
 				# libros, donde cada libro tiene solo uno o ningún predecesor."
 				for b in tmp_addi_books:
+					if added_edges[i] == num_addi_books - 1: # Un graf acíclic no pot tenir més arestes que nodes - 1
+						break
 					if np.random.choice([True, False]):
 						while True:
 							tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
@@ -299,12 +301,15 @@ for i, test_graph in enumerate(graphs):
 				# es capaz de construir un plan para poder llegar a leer los libros objetivo, donde para todo
 				# libro que pertenece al plan, todos sus libros predecesores pertenecen al plan y están en meses anteriores."
 				for b in tmp_addi_books:
+					if added_edges[i] == num_addi_books - 1: # Un graf acíclic no pot tenir més arestes que nodes - 1
+						break
 					for _ in range(np.random.randint(num_addi_books)):
-						while True:
-							tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
-							if tmp_pred != b:
-								break
-						add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
+						if np.random.choice([True, False]):
+							while True:
+								tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
+								if tmp_pred != b:
+									break
+							add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
 
 			elif level == 2:
 				# "Extensión 2: Extensión 1 + los libros pueden tener de 0 a M libros paralelos. El planner es
@@ -312,41 +317,51 @@ for i, test_graph in enumerate(graphs):
 				# que pertenece al plan, todos sus libros paralelos pertenecen al plan y están en el mismo mes o
 				# en meses anteriores."
 				for b in tmp_addi_books:
+					if added_edges[i] == num_addi_books - 1: # Un graf acíclic no pot tenir més arestes que nodes - 1
+						break
 					for _ in range(np.random.randint(num_addi_books)):
-						while True:
-							tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
-							if tmp_pred != b:
-								break
-						add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
-				
-					while True:
-						tmp_parallel: Book = np.random.choice(np.array(tmp_addi_books))
-						if tmp_parallel != b:
-							break
-					if tmp_parallel not in test_graph.neighbors(b):
-						add_edge_if_no_cycle(graph=test_graph, u=tmp_parallel, v=b, edge_name='parallel', cycle_type='undirected')
+						random_value = np.random.choice(['predecessor', 'predecessor', 'parallel', 'None', 'None', 'None']) # 2/6 de probabilitat de predecessor, 1/6 de probabilitat de parallel, 2/6 de probabilitat de no afegir aresta
+						if random_value == 'predecessor':
+							while True:
+								tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
+								if tmp_pred != b:
+									break
+							added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
+							if added:
+								added_edges[i] += 1
+						elif random_value == 'parallel':
+							while True:
+								tmp_parallel: Book = np.random.choice(np.array(tmp_addi_books))
+								if tmp_parallel != b:
+									break
+							if tmp_parallel not in test_graph.neighbors(b):
+								added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_parallel, v=b, edge_name='parallel', cycle_type='undirected')
 			
 			elif level == 3:
 				# Extensión 3: Los libros tienen además un número de páginas. El planificador controla que en
 				# el plan generado no se superen las 800 páginas al mes.
 				for b in tmp_addi_books:
+					if added_edges[i] == num_addi_books - 1: # Un graf acíclic no pot tenir més arestes que nodes - 1
+						break
 					for _ in range(np.random.randint(num_addi_books)):
-						while True:
-							tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
-							if tmp_pred != b:
-								break
-						add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
-				
-					while True:
-						tmp_parallel: Book = np.random.choice(np.array(tmp_addi_books))
-						if tmp_parallel != b:
-							break
-					# Comprova que la suma de les pàgines dels llibres paral·lels no superi les 1600 pàgines (2 mesos amb un màxim de 800 pàgines cada mes)
-					# Comprova que estiguin en un grup de paral·lels diferent. Si estan en el mateix grup, no cal afegir l'aresta perquè ja són paral·lels.
-					if parallel_chained_nodes(graph=test_graph, initial_node=b) != parallel_chained_nodes(graph=test_graph, initial_node=tmp_parallel):
-						if tmp_parallel not in test_graph.neighbors(b) \
-							and (sum(p1.pages for p1 in parallel_chained_nodes(graph=test_graph, initial_node=b)) + sum(p2.pages for p2 in parallel_chained_nodes(graph=test_graph, initial_node=tmp_parallel))) <= 1600:
-							add_edge_if_no_cycle(graph=test_graph, u=tmp_parallel, v=b, edge_name='parallel', cycle_type='undirected')
+						random_value = np.random.choice(['predecessor', 'predecessor', 'parallel', 'None', 'None', 'None']) # 2/6 de probabilitat de predecessor, 1/6 de probabilitat de parallel, 2/6 de probabilitat de no afegir aresta
+						if random_value == 'predecessor':
+							while True:
+								tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
+								if tmp_pred != b:
+									break
+							add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
+						elif random_value == 'parallel':
+							while True:
+								tmp_parallel: Book = np.random.choice(np.array(tmp_addi_books))
+								if tmp_parallel != b:
+									break
+							# Comprova que la suma de les pàgines dels llibres paral·lels no superi les 1600 pàgines (2 mesos amb un màxim de 800 pàgines cada mes)
+							# Comprova que estiguin en un grup de paral·lels diferent. Si estan en el mateix grup, no cal afegir l'aresta perquè ja són paral·lels.
+							if parallel_chained_nodes(graph=test_graph, initial_node=b) != parallel_chained_nodes(graph=test_graph, initial_node=tmp_parallel):
+								if tmp_parallel not in test_graph.neighbors(b) \
+									and (sum(p1.pages for p1 in parallel_chained_nodes(graph=test_graph, initial_node=b)) + sum(p2.pages for p2 in parallel_chained_nodes(graph=test_graph, initial_node=tmp_parallel))) <= 1600:
+									add_edge_if_no_cycle(graph=test_graph, u=tmp_parallel, v=b, edge_name='parallel', cycle_type='undirected')
 
 # Mostra els grafs de cada joc de proves
 for i, test_graph in enumerate(graphs):
