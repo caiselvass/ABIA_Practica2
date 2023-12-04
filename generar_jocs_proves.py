@@ -414,7 +414,7 @@ for i, test_graph in enumerate(graphs):
 		print(f"\t* S'ha generat el fitxer 'generated_problem_ext_{level}_v{i+1}.pddl' en el directori 'problems' amb el joc de proves {i+1}.")
 
 		# HEADER
-		file.write(f'(define (problem reading_plan_problem_ext_{level}_{i+1})\n\t(:domain reading_plan)\n')
+		file.write(f'(define (problem generated_problem_ext_{level}_v{i+1})\n\t(:domain reading_plan)\n')
 
 		# OBJECTS
 		books_str = ' '.join(list(str(n) for n in test_graph.nodes))
@@ -446,7 +446,12 @@ for i, test_graph in enumerate(graphs):
 		if read_all_books:
 			goal_books: set = set(test_graph.nodes)
 		else:
-			goal_books: set = set(np.random.choice(list(test_graph.nodes), size=np.random.randint(1, len(list(test_graph.nodes)) + 1), replace=False))
+			pc_min: float = 0.2
+			pc_max: float = 0.3
+			min_goal_books: int = int(round(len(list(test_graph.nodes)) * pc_min, 0)) # Mínim 20% dels llibres
+			max_goal_books: int = int(round(len(list(test_graph.nodes)) * pc_max, 0)) if int(round(len(list(test_graph.nodes)) * pc_max, 0)) > min_goal_books else int(round(len(list(test_graph.nodes)) * pc_max, 0) + 1) # Màxim 30% dels llibres (+ 1 en cas de ser igual que min_goal_books)
+			
+			goal_books: set = set(np.random.choice(list(test_graph.nodes), size=np.random.randint(min_goal_books, max_goal_books), replace=False))
 		
 		if level >= 2:
 			# Parallels
