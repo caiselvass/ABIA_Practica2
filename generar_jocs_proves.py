@@ -348,7 +348,7 @@ for i, test_graph in enumerate(graphs):
 					if tmp_added_edges >= num_addi_books - 1: # Un graf acíclic no pot tenir més arestes que nodes - 1
 						break
 					for _ in range(np.random.randint(num_addi_books)):
-						random_value = np.random.choice(['predecessor', 'predecessor', 'parallel', 'None', 'None', 'None']) # 2/6 de probabilitat de predecessor, 1/6 de probabilitat de parallel, 2/6 de probabilitat de no afegir aresta
+						random_value = np.random.choice(['predecessor', 'predecessor', 'parallel', 'None', 'None', 'None']) # 2/6 de probabilitat de predecessor, 1/6 de probabilitat de parallel, 3/6 de probabilitat de no afegir aresta
 						if random_value == 'predecessor':
 							while True:
 								tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
@@ -374,7 +374,7 @@ for i, test_graph in enumerate(graphs):
 					if tmp_added_edges >= num_addi_books - 1: # Un graf acíclic no pot tenir més arestes que nodes - 1
 						break
 					for _ in range(np.random.randint(num_addi_books)):
-						random_value = np.random.choice(['predecessor', 'predecessor', 'parallel', 'None', 'None', 'None']) # 2/6 de probabilitat de predecessor, 1/6 de probabilitat de parallel, 2/6 de probabilitat de no afegir aresta
+						random_value = np.random.choice(['predecessor', 'predecessor', 'parallel', 'None', 'None', 'None']) # 2/6 de probabilitat de predecessor, 1/6 de probabilitat de parallel, 3/6 de probabilitat de no afegir aresta
 						if random_value == 'predecessor':
 							while True:
 								tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
