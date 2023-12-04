@@ -294,7 +294,9 @@ for i, test_graph in enumerate(graphs):
 							tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
 							if tmp_pred != b:
 								break
-						add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
+						added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
+						if added:
+							added_edges[i] += 1
 				
 			elif level == 1:
 				# "Extensión 1: Los libros pueden tener de 0 a N predecesores pero ningún paralelo. El planner
@@ -309,7 +311,9 @@ for i, test_graph in enumerate(graphs):
 								tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
 								if tmp_pred != b:
 									break
-							add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
+							added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
+							if added:
+								added_edges[i] += 1
 
 			elif level == 2:
 				# "Extensión 2: Extensión 1 + los libros pueden tener de 0 a M libros paralelos. El planner es
@@ -336,6 +340,8 @@ for i, test_graph in enumerate(graphs):
 									break
 							if tmp_parallel not in test_graph.neighbors(b):
 								added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_parallel, v=b, edge_name='parallel', cycle_type='undirected')
+								if added:
+									added_edges[i] += 1
 			
 			elif level == 3:
 				# Extensión 3: Los libros tienen además un número de páginas. El planificador controla que en
@@ -350,7 +356,9 @@ for i, test_graph in enumerate(graphs):
 								tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
 								if tmp_pred != b:
 									break
-							add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
+							added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
+							if added:
+								added_edges[i] += 1
 						elif random_value == 'parallel':
 							while True:
 								tmp_parallel: Book = np.random.choice(np.array(tmp_addi_books))
@@ -361,7 +369,9 @@ for i, test_graph in enumerate(graphs):
 							if parallel_chained_nodes(graph=test_graph, initial_node=b) != parallel_chained_nodes(graph=test_graph, initial_node=tmp_parallel):
 								if tmp_parallel not in test_graph.neighbors(b) \
 									and (sum(p1.pages for p1 in parallel_chained_nodes(graph=test_graph, initial_node=b)) + sum(p2.pages for p2 in parallel_chained_nodes(graph=test_graph, initial_node=tmp_parallel))) <= 1600:
-									add_edge_if_no_cycle(graph=test_graph, u=tmp_parallel, v=b, edge_name='parallel', cycle_type='undirected')
+									added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_parallel, v=b, edge_name='parallel', cycle_type='undirected')
+									if added:
+										added_edges[i] += 1
 
 # Mostra els grafs de cada joc de proves
 for i, test_graph in enumerate(graphs):
