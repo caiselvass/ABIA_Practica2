@@ -231,7 +231,7 @@ while True:
 # Llegir tots els llibres o que sigui aleatori
 while True:
 	try:
-		read_all_books: Union[bool, str] = input("Vols llegir tots els llibres possibles o que siguin triats aleatòriament? [ALL/R]: ").replace(' ', '')
+		read_all_books: Union[bool, str] = input("Vols llegir tots els llibres possibles (ALL) o que siguin triats aleatòriament (R)? [ALL/R]: ").replace(' ', '')
 		if read_all_books not in {'ALL', 'all', 'R', 'r'}:
 			raise ValueError
 		else:
