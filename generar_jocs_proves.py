@@ -58,7 +58,7 @@ def add_edge_if_no_cycle(graph: nx.DiGraph, u: Book, v: Book, edge_name: str, cy
 		return True
 	return False
 	
-def parallel_chained_nodes(graph: nx.DiGraph, initial_node: Book) -> set[Book]:
+def parallel_chained_nodes(graph: nx.DiGraph, initial_node: Book) -> tuple:
 	"""
 	Retorna un conjunt amb tots els nodes que estan enllaçats amb el node inicial mitjançant arestes 'parallel' (incloent el node inicial).
 	"""
@@ -94,7 +94,10 @@ def parallel_chained_nodes(graph: nx.DiGraph, initial_node: Book) -> set[Book]:
 
 	recursive(initial_node)
 	
-	return visited
+	list_visited = list(visited)
+	list_visited.sort(key=lambda x: x.name)
+
+	return tuple(list_visited)
 
 
 # Nivell d'extensió dels jocs de proves
@@ -450,7 +453,7 @@ for i, test_graph in enumerate(graphs):
 			parallel_groups: set = set()
 			file.write('\t\t;;Parallels\n')
 			for n in set(test_graph.nodes):
-				parallel_groups.add(tuple(parallel_chained_nodes(graph=test_graph, initial_node=n)))
+				parallel_groups.add(parallel_chained_nodes(graph=test_graph, initial_node=n))
 			
 			for group in parallel_groups:
 				group_root = list(group)[0]
