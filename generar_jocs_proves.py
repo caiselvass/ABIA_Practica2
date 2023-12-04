@@ -46,7 +46,7 @@ def has_cycle(graph: nx.DiGraph, u: Book, v: Book, cycle_type: str = 'directed')
 		graph.remove_edge(u, v)
 	return False
 
-def add_edge_if_no_cycle(graph: nx.DiGraph, u: Book, v: Book, edge_name: str, cycle_type: str = 'directed') -> bool:
+def add_edge_if_no_cycle(graph: nx.DiGraph, u: Book, v: Book, edge_name: str, cycle_type: str = 'directed') -> None:
 	assert edge_name in {'predecessor', 'parallel'}, "Error: El nom de l'aresta ha de ser 'predecessor' o 'parallel'."
 	assert cycle_type in {'directed', 'undirected'}, "Error: El tipus de cicle ha de ser 'directed' o 'undirected'."
 	"""
@@ -59,28 +59,23 @@ def add_edge_if_no_cycle(graph: nx.DiGraph, u: Book, v: Book, edge_name: str, cy
 		print(f"\t* Aresta {edge_name.capitalize()}({u} -> {v}) afegida correctament.")
 	
 def parallel_chained_nodes(graph: nx.DiGraph, initial_node: Book) -> set[Book]:
-	"""
-	Retorna el conjunt de nodes que formen part de la mateixa 'cadena' formada
-	només per arestes de tipus 'parallel' que conté el node inicial.
-	"""
-	assert graph.number_of_nodes() > 0, "El graf no pot estar buit."
-	assert graph.has_node(initial_node), "El node inicial ha d'estar en el graf."
+    assert graph.number_of_nodes() > 0, "El graf no pot estar buit."
+    assert graph.has_node(initial_node), "El node inicial ha d'estar en el graf."
 
-	parallel_chain = set()
-	parallel_chain.add(initial_node)
+    parallel_chain: set = {initial_node}
 
-	# Funció auxiliar per recórrer el graf de manera recursiva
-	def recursive(node: Book):
-		for neighbor in graph.neighbors(node):
-			if neighbor not in parallel_chain and \
-			   ('parallel' in [graph.get_edge_data(node, neighbor, {}).get('name', ''),
-								graph.get_edge_data(neighbor, node, {}).get('name', '')]):
-				parallel_chain.add(neighbor)
-				recursive(neighbor)
+    def recursive(node: Book):
+        for neighbor in graph.neighbors(node):
+            if neighbor not in parallel_chain:
+                edge_data_forward = graph.get_edge_data(node, neighbor, {}).get('name', '')
+                edge_data_backward = graph.get_edge_data(neighbor, node, {}).get('name', '')
+                if 'parallel' in {edge_data_forward, edge_data_backward}:
+                    parallel_chain.add(neighbor)
+                    recursive(neighbor)
 
-	recursive(initial_node)
+    recursive(initial_node)
+    return parallel_chain
 
-	return parallel_chain
 
 # Nivell d'extensió dels jocs de proves
 while True:
@@ -406,15 +401,12 @@ for i, test_graph in enumerate(graphs):
 		
 		if level >= 2:
 			# Parallels
-			parallel_groups = {}
+			parallel_groups: set = set()
 			file.write('\t\t;;Parallels\n')
 			for n in set(test_graph.nodes):
-				if tuple(parallel_chained_nodes(graph=test_graph, initial_node=n)) in parallel_groups.keys():
-					parallel_groups[tuple(parallel_chained_nodes(graph=test_graph, initial_node=n))].add(n)
-				else:
-					parallel_groups[tuple(parallel_chained_nodes(graph=test_graph, initial_node=n))] = {n}
+				parallel_groups.add(tuple(parallel_chained_nodes(graph=test_graph, initial_node=n)))
 			
-			for group in parallel_groups.values():
+			for group in parallel_groups:
 				group_root = list(group)[0]
 				for n in group:
 					if n in goal_books:
