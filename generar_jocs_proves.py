@@ -362,7 +362,7 @@ for i, test_graph in enumerate(graphs):
 # Generació dels jocs de proves
 for i, test_graph in enumerate(graphs):
 	with open(f'./problems/generated_problem_ext_{level}_{i+1}.pddl', 'w') as file:
-		print(f"S'ha generat el fitxer 'generated_problem_ext_{level}_{i+1}.pddl' en el directori 'problems' amb el joc de proves {i+1}.")
+		print(f"\t* S'ha generat el fitxer 'generated_problem_ext_{level}_{i+1}.pddl' en el directori 'problems' amb el joc de proves {i+1}.")
 
 		# HEADER
 		file.write(f'(define (problem reading_plan_problem_ext_{level}_{i+1})\n\t(:domain reading_plan)\n')
