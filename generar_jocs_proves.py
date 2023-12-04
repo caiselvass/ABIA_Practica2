@@ -7,7 +7,7 @@ import os
 
 # Comprovació de la correcta instal·lació del planner per MacOS
 def correct_compilation_on_mac():
-    return os.path.isfile('./executables/macos/ff')
+	return os.path.isfile('./executables/macos/ff')
 
 # Definició de classe Book
 class Book:
@@ -59,22 +59,42 @@ def add_edge_if_no_cycle(graph: nx.DiGraph, u: Book, v: Book, edge_name: str, cy
 	return False
 	
 def parallel_chained_nodes(graph: nx.DiGraph, initial_node: Book) -> set[Book]:
-    assert graph.number_of_nodes() > 0, "El graf no pot estar buit."
-    assert graph.has_node(initial_node), "El node inicial ha d'estar en el graf."
+	"""
+	Retorna un conjunt amb tots els nodes que estan enllaçats amb el node inicial mitjançant arestes 'parallel' (incloent el node inicial).
+	"""
+	assert graph.number_of_nodes() > 0, "El graf no pot estar buit."
+	assert graph.has_node(initial_node), "El node inicial ha d'estar en el graf."
 
-    parallel_chain: set = {initial_node}
+	visited = set()
 
-    def recursive(node: Book):
-        for neighbor in graph.neighbors(node):
-            if neighbor not in parallel_chain:
-                edge_data_forward = graph.get_edge_data(node, neighbor, {}).get('name', '')
-                edge_data_backward = graph.get_edge_data(neighbor, node, {}).get('name', '')
-                if 'parallel' in {edge_data_forward, edge_data_backward}:
-                    parallel_chain.add(neighbor)
-                    recursive(neighbor)
+	def is_parallel(node1: Book, node2: Book):
+		"""
+		Retorna True si existeix una aresta 'parallel' que va de node1 a node2 o de node2 a node1, False en cas contrari.
+		"""
+		return (graph.get_edge_data(node1, node2, {}).get('name', '') == 'parallel' or
+				graph.get_edge_data(node2, node1, {}).get('name', '') == 'parallel')
 
-    recursive(initial_node)
-    return parallel_chain
+	def recursive(node: Book):
+		"""
+		Recorre el graf de forma recursiva per trobar tots els nodes que estan enllaçats amb el node inicial mitjançant arestes 'parallel'.
+		"""
+		if node in visited:
+			return
+		
+		visited.add(node)
+
+		for neighbor in graph.neighbors(node):
+			if is_parallel(node, neighbor):
+				recursive(neighbor)
+
+		# Revisar también los nodos que apuntan a este con una arista 'parallel'
+		for predecessor in graph.predecessors(node):
+			if is_parallel(predecessor, node):
+				recursive(predecessor)
+
+	recursive(initial_node)
+	
+	return visited
 
 
 # Nivell d'extensió dels jocs de proves
