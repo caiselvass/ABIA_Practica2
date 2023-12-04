@@ -252,12 +252,11 @@ if (not read_all_books) or (num_addi_books > 1):
 			if seed < 0:
 				raise ValueError
 			elif seed == 0:
-				seed = None
-			np.random.seed(seed)
-		
+				seed = None		
 		except ValueError:
 			print("Error: Introdueix un nombre enter >= 0.")
 			continue
+		np.random.seed(seed)
 		break
 
 # Generació dels grafs per cada joc de proves
