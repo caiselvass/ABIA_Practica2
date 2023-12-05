@@ -272,7 +272,7 @@ while True:
 	try:
 		proportion_edges_str: str = input("\nIntrodueix el percentatge de relacions entre llibres (arestes entre nodes) que vols afegir respecte el total possible (HELP per més informació): ").replace(' ', '').replace(',', '.')
 		if proportion_edges_str in {'HELP', 'help'}:
-			print(f"El percentatge que introdueixis determinarà la quantitat d'arestes que tindrà el graf del joc de proves. És a dir, el nombre de relacions 'predecessor' + 'parallel'. En aquest cas tenim {num_addi_books} nodes, de manera que el total de relacions entre llibres possibles (el 100%) és {num_addi_books - 1}.")
+			print(f"El percentatge que introdueixis determinarà la quantitat d'arestes que tindrà el graf del joc de proves. És a dir, el nombre de relacions 'predecessor' + 'parallel'. En aquest cas tenim {num_addi_books} nodes, de manera que el total de relacions entre llibres possibles (el 100%) és {num_addi_books - 1} (nombre_de_nodes - 1, ja que treballem amb grafs).")
 			continue
 		chosen_proportion_edges: float = float(proportion_edges_str)
 		if not (0 <= chosen_proportion_edges <= 100):
@@ -458,7 +458,7 @@ for i, test_graph in enumerate(graphs):
 	edge_colors: list = ['lightblue' if test_graph.edges[e]['name'] == 'predecessor' else 'red' for e in test_graph.edges]
 	node_colors: list = ['#b8e6c4' if n in list_goal_books[i] else ('#f5c8a6' if n in list_read_books[i] else 'lightgray') for n in test_graph.nodes]
 
-	nx.draw(test_graph, pos=nx.spring_layout(test_graph) ,with_labels=True, node_color=node_colors, edge_color=edge_colors, node_size=250, arrowstyle='->', arrowsize=35, font_size=8)
+	nx.draw(test_graph, pos=nx.spring_layout(test_graph, k=0.5) ,with_labels=True, node_color=node_colors, edge_color=edge_colors, node_size=250, arrowstyle='->', arrowsize=35, font_size=8)
 	plt.show()
 
 # Generació dels jocs de proves
@@ -514,13 +514,6 @@ for i, test_graph in enumerate(graphs):
 						break
 				
 				if group_root is None:
-					# Busquem un node "semi_goal"
-					for n in group:
-						if n in test_graph.neighbors(goal_books):
-							group_root = n
-							break
-				
-				if not group_root:
 					# Busquem un node que tingui un predecessor que sigui un node "semi_goal"
 					for n in group:
 						if is_semi_goal(graph=test_graph, node=n, goal_books=goal_books):
