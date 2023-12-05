@@ -555,9 +555,9 @@ for i, test_graph in enumerate(graphs):
 			for m in months.split():
 				file.write(f'\t\t(= (pages_read {m}) 0)\n')
 			
-			# Initial number of months
-			file.write('\t\t;;Initial number of months\n')
-			file.write('\t\t(= (num_months_created) 1)\n')
+		# Initial number of months
+		file.write('\t\t;;Initial number of months\n')
+		file.write('\t\t(= (num_months_created) 1)\n')
 
 		file.write('\t)\n')
 
