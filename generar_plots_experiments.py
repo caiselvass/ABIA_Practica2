@@ -40,7 +40,7 @@ if experiment == '1':
     plt.grid(True)
     plt.savefig(f'./experiments/plots/experiment1_{extensio}.png')
     plt.show()
-    print(f'experiment1_{extensio}.png saved')
+    print(f"\t* S\'ha guardat la gràfica 'experiment1_{extensio}.png' en el directori 'experiments/plots'.")
 
 elif experiment == '2':
     data = pd.read_csv('./experiments/data/experiment2.csv')
@@ -61,16 +61,14 @@ elif experiment == '2':
 
     sns.lineplot(ax=axes[1, 0], data=data, x="NÚMERO LLIBRES", y="EASY", hue="TIPUS")
     axes[1, 0].set_title('Number of Books vs Easy Actions')
-    print('Easy Actions plot saved')
 
     sns.lineplot(ax=axes[1, 1], data=data, x="NÚMERO LLIBRES", y="HARD ACTION", hue="TIPUS")
     axes[1, 1].set_title('Number of Books vs Hard Actions')
-    print('Hard Actions plot saved')
 
     # Save the plot as Experimento2.png
     plt.savefig('./experiments/plots/experiment2.png')
     plt.show()
-    print('experiment2.png saved.')
+    print("\t* S\'ha guardat la gràfica 'experiment2.png' en el directori 'experiments/plots'.")
 
     # Create a plot to visualize the relationship between the time and the number of books
     plt.figure(figsize=(10, 6))
@@ -81,4 +79,4 @@ elif experiment == '2':
 
     # Save the plot as Experiment2_2.png
     plt.savefig('./experiments/plots/experiment2_2.png')
-    print('experiment2_2.png saved.')
+    print("\t* S\'ha guardat la gràfica 'experiment2_2.png' en el directori 'experiments/plots'.")

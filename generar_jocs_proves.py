@@ -464,7 +464,7 @@ for i, test_graph in enumerate(graphs):
 	edge_colors: list = ['lightblue' if test_graph.edges[e]['name'] == 'predecessor' else 'red' for e in test_graph.edges]
 	node_colors: list = ['#b8e6c4' if n in list_goal_books[i] else ('#f5c8a6' if n in list_read_books[i] else 'lightgray') for n in test_graph.nodes]
 
-	nx.draw(test_graph, pos=nx.spring_layout(test_graph, k=0.5) ,with_labels=True, node_color=node_colors, edge_color=edge_colors, node_size=250, arrowstyle='->', arrowsize=35, font_size=8)
+	nx.draw(test_graph, with_labels=True, node_color=node_colors, edge_color=edge_colors, node_size=250, arrowstyle='->', arrowsize=35, font_size=8)
 	plt.show()
 
 # Generació dels jocs de proves
