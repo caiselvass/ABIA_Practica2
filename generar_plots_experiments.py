@@ -71,3 +71,14 @@ elif experiment == '2':
     plt.savefig('./experiments/plots/experiment2.png')
     plt.show()
     print('experiment2.png saved.')
+
+    # Create a plot to visualize the relationship between the time and the number of books
+    plt.figure(figsize=(10, 6))
+    sns.lineplot(data=data, x="NÚMERO LLIBRES", y="TEMPS", hue="TIPUS")
+    plt.title('Temps vs Número de Llibres')
+    plt.xlabel('Número de Llibres')
+    plt.ylabel('Temps (en segons)')
+
+    # Save the plot as Experiment2_2.png
+    plt.savefig('./experiments/plots/experiment2_2.png')
+    print('experiment2_2.png saved.')
