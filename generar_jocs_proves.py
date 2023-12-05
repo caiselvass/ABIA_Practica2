@@ -364,20 +364,9 @@ for i, test_graph in enumerate(graphs):
 					tmp_node2: Book = np.random.choice(np.array(tmp_addi_books))
 
 					if tmp_node1 != tmp_node2 \
-						and not set(test_graph.predecessors(tmp_node1)):
+						and (tmp_node2, tmp_node1) not in test_graph.edges \
+							and not set(test_graph.predecessors(tmp_node1)):
 						added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_node2, v=tmp_node1, edge_name='predecessor', cycle_type='undirected')
-						if added:
-							tmp_added_predecessor += 1
-
-				for b in tmp_addi_books:
-					if tmp_added_predecessor >= edge_limit: # Un graf acíclic no pot tenir més arestes que nodes - 1
-						break
-					if np.random.choice([True, False]):
-						while True:
-							tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
-							if tmp_pred != b:
-								break
-						added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
 						if added:
 							tmp_added_predecessor += 1
 				
@@ -389,7 +378,8 @@ for i, test_graph in enumerate(graphs):
 					tmp_node1: Book = np.random.choice(np.array(tmp_addi_books))
 					tmp_node2: Book = np.random.choice(np.array(tmp_addi_books))
 
-					if tmp_node1 != tmp_node2:
+					if tmp_node1 != tmp_node2 \
+						and (tmp_node1, tmp_node2) not in test_graph.edges:
 						added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_node1, v=tmp_node2, edge_name='predecessor', cycle_type='undirected')
 						if added:
 							tmp_added_predecessor += 1
@@ -405,7 +395,8 @@ for i, test_graph in enumerate(graphs):
 					tmp_node1: Book = np.random.choice(np.array(tmp_addi_books))
 					tmp_node2: Book = np.random.choice(np.array(tmp_addi_books))
 
-					if tmp_node1 != tmp_node2:
+					if tmp_node1 != tmp_node2 \
+						and (tmp_node1, tmp_node2) not in test_graph.edges:
 						added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_node1, v=tmp_node2, edge_name='predecessor', cycle_type='undirected')
 						if added:
 							tmp_added_predecessor += 1
@@ -415,11 +406,11 @@ for i, test_graph in enumerate(graphs):
 					tmp_node1: Book = np.random.choice(np.array(tmp_addi_books))
 					tmp_node2: Book = np.random.choice(np.array(tmp_addi_books))
 
-					if tmp_node1 != tmp_node2:
-						if tmp_node2 not in test_graph.neighbors(tmp_node1):
-							added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_node1, v=tmp_node2, edge_name='parallel', cycle_type='undirected')
-							if added:
-								tmp_added_parallel += 1
+					if tmp_node1 != tmp_node2 \
+						and (tmp_node1, tmp_node2) not in test_graph.edges:
+						added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_node1, v=tmp_node2, edge_name='parallel', cycle_type='undirected')
+						if added:
+							tmp_added_parallel += 1
 			
 			elif level == 3:
 				# Extensión 3: Los libros tienen además un número de páginas. El planificador controla que en
@@ -430,7 +421,8 @@ for i, test_graph in enumerate(graphs):
 					tmp_node1: Book = np.random.choice(np.array(tmp_addi_books))
 					tmp_node2: Book = np.random.choice(np.array(tmp_addi_books))
 
-					if tmp_node1 != tmp_node2:
+					if tmp_node1 != tmp_node2 \
+						and (tmp_node1, tmp_node2) not in test_graph.edges:
 						added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_node1, v=tmp_node2, edge_name='predecessor', cycle_type='undirected')
 						if added:
 							tmp_added_predecessor += 1
@@ -444,7 +436,7 @@ for i, test_graph in enumerate(graphs):
 						# Comprova que la suma de les pàgines dels llibres paral·lels no superi les 1600 pàgines (2 mesos amb un màxim de 800 pàgines cada mes)
 						# Comprova que estiguin en un grup de paral·lels diferent. Si estan en el mateix grup, no cal afegir l'aresta perquè ja són paral·lels.
 						if parallel_chained_nodes(graph=test_graph, initial_node=tmp_node1) != parallel_chained_nodes(graph=test_graph, initial_node=tmp_node2):
-							if tmp_node2 not in test_graph.neighbors(tmp_node1) \
+							if (tmp_node1, tmp_node2) not in test_graph.edges \
 								and (sum(p1.pages for p1 in parallel_chained_nodes(graph=test_graph, initial_node=tmp_node1)) + sum(p2.pages for p2 in parallel_chained_nodes(graph=test_graph, initial_node=tmp_node2))) <= 1600:
 								added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_node1, v=tmp_node2, edge_name='parallel', cycle_type='undirected')
 								if added:
