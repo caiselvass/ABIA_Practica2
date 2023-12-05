@@ -1,3 +1,0 @@
-Aquest arxiu és necessari per tal de que la carpeta 'results' no s'esborri (pel fet d'estar buida) i així poder guardar els resultats de la predicció.
-
-NO elimineu aquest document.

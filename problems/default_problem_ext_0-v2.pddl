@@ -31,6 +31,8 @@
 		;;Books the user would like to read
 		(goal_book Book_5)
         (goal_book Book_10)
+		;;Initialize num_months_created
+		(= (num_months_created) 0)
 	)
 	;;Goal
 	(:goal

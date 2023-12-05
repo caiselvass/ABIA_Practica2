@@ -1,5 +1,5 @@
 (define (domain reading_plan)
-    (:requirements :typing :negative-preconditions :existential-preconditions :disjunctive-preconditions)
+    (:requirements :typing :negative-preconditions :existential-preconditions :disjunctive-preconditions :fluents)
 
     ;; Types
     (:types
@@ -15,6 +15,11 @@
         (current_month ?m - month)
         (next_month ?m1 - month ?m2 - month)
         (previous_month ?m - month)
+    )
+
+    ;; Functions
+    (:functions
+        (num_months_created)
     )
 
     ;; Actions
@@ -48,6 +53,7 @@
             (current_month ?nextm)
             (previous_month ?actualm)
             (not (previous_month ?prevm))
+            (increase (num_months_created) 1) 
         )
     )
 )

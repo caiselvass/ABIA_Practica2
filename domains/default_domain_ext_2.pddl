@@ -1,5 +1,5 @@
 (define (domain reading_plan)
-    (:requirements :typing :negative-preconditions :disjunctive-preconditions :existential-preconditions :universal-preconditions)
+    (:requirements :typing :negative-preconditions :disjunctive-preconditions :existential-preconditions :universal-preconditions :fluents)
 
     ;; Types
     (:types
@@ -18,12 +18,18 @@
         (previous_month ?m - month)
     )
 
+
+    ;; Functions
+    (:functions
+        (num_months_created)
+    )
+
     ;; Actions
     (:action assign_book
         :parameters (?b - book ?actualm - month ?prevm - month)
         :precondition (and
             (not (read ?b))
-            (or (goal_book ?b) (exists (?x - book) (predecessor ?b ?x)))
+            (or (goal_book ?b) (exists (?x - book) (predecessor ?b ?x)) (exists (?y - book) (parallel ?y ?b)))
             (current_month ?actualm)
             (previous_month ?prevm)
             ;; The predecessors must have been read before the book's month
@@ -51,6 +57,7 @@
             (current_month ?nextm)
             (previous_month ?actualm)
             (not (previous_month ?prevm))
+            (increase (num_months_created) 1) 
         )
     )
 )
