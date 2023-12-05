@@ -109,7 +109,7 @@ def is_semi_goal(graph: nx.DiGraph, node: Book, goal_books: set) -> bool:
 		if predecessor in goal_books:
 			return True
 	
-	return any(goal_or_semi_goal(graph, predecessor, goal_books) for predecessor in predecessors)
+	return any(is_semi_goal(graph, predecessor, goal_books) for predecessor in predecessors)
 
 # Nivell d'extensió dels jocs de proves
 while True:
