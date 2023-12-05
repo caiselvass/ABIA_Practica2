@@ -438,14 +438,19 @@ for i, test_graph in enumerate(graphs):
 										tmp_added_edges += 1
 
 # Mostra els grafs de cada joc de proves
+list_goal_books: list[set] = []
 for i, test_graph in enumerate(graphs):
 	print(f"\n\n********** JOC DE PROVES {i+1} **********\n")
 	print(f"\t* {len(test_graph.nodes)} NODES: {[(n.name, n.pages) if n.pages is not None else n.name for n in list(test_graph.nodes)]}\n")
 	print(f"\t* {len(list(e for e in test_graph.edges if test_graph.edges[e]['name'] == 'predecessor'))} ARESTES 'PREDECESSOR': {list(f'({e[0]} -> {e[1]})' for e in test_graph.edges if test_graph.edges[e]['name'] == 'predecessor')}\n")
 	print(f"\t* {len(list(e for e in test_graph.edges if test_graph.edges[e]['name'] == 'parallel'))} ARESTES 'PARALLEL': {list(f'({e[0]} -> {e[1]})' for e in test_graph.edges if test_graph.edges[e]['name'] == 'parallel')}\n")
 
-	edge_colors = ['lightblue' if test_graph.edges[e]['name'] == 'predecessor' else 'red' for e in test_graph.edges]
-	nx.draw(test_graph, with_labels=True, node_color='lightgray', edge_color=edge_colors, node_size=250, arrowstyle='->', arrowsize=35, font_size=8)
+	list_goal_books.append(set(np.random.choice(list(test_graph.nodes), size=int(max(1, round(test_graph.number_of_nodes() * proportion_to_read, 0))), replace=False)))
+
+	edge_colors: list = ['lightblue' if test_graph.edges[e]['name'] == 'predecessor' else 'red' for e in test_graph.edges]
+	node_colors: list = ['lightgray' if n not in list_goal_books[i] else '#b8e6c4' for n in test_graph.nodes]
+
+	nx.draw(test_graph, with_labels=True, node_color=node_colors, edge_color=edge_colors, node_size=250, arrowstyle='->', arrowsize=35, font_size=8)
 	plt.show()
 
 # Generació dels jocs de proves
@@ -482,9 +487,9 @@ for i, test_graph in enumerate(graphs):
 			if test_graph.edges[e]['name'] == 'predecessor':
 				file.write(f'\t\t(predecessor {e[0]} {e[1]})\n')
 		
-		# Goal books			
-		goal_books: set = set(np.random.choice(list(test_graph.nodes), size=int(max(1, round(test_graph.number_of_nodes() * proportion_to_read, 0))), replace=False))
-		
+		#Goal books
+		goal_books: set = list_goal_books[i]
+
 		if level >= 2:
 			# Parallels
 			parallel_groups: set = set()
