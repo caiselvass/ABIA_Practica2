@@ -453,7 +453,11 @@ for i, test_graph in enumerate(graphs):
 	list_goal_books.append(set(np.random.choice(list(test_graph.nodes), size=int(max(1, round(test_graph.number_of_nodes() * proportion_to_read, 0))), replace=False)))
 	tmp_remaining_books: set = set(test_graph.nodes) - list_goal_books[i] # No podem haver llegit llibres que ens volem llegir en un futur (seria una contradicció)
 	tmp_num_remaining_books: int = len(tmp_remaining_books)
-	list_read_books.append(set(np.random.choice(list(tmp_remaining_books), size=np.random.randint(max(1, tmp_num_remaining_books), tmp_num_remaining_books + 1), replace=False)))
+	if tmp_num_remaining_books > 0:
+		tmp_num_read_books = np.random.randint(1, len(tmp_remaining_books) + 1)
+		list_read_books.append(set(np.random.choice(list(tmp_remaining_books), size=tmp_num_read_books, replace=False)))
+	else:
+		list_read_books.append(set())
 
 	edge_colors: list = ['lightblue' if test_graph.edges[e]['name'] == 'predecessor' else 'red' for e in test_graph.edges]
 	node_colors: list = ['#b8e6c4' if n in list_goal_books[i] else ('#f5c8a6' if n in list_read_books[i] else 'lightgray') for n in test_graph.nodes]
