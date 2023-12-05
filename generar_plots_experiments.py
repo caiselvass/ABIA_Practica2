@@ -4,11 +4,11 @@ import seaborn as sns
 
 while True:
     try:
-        experiment = input('Quin experiment vols representar? [1, 2, 3]:')
-        if experiment not in ['1', '2', '3']:
+        experiment = input('Quin experiment vols representar? [1, 2]:')
+        if experiment not in ['1', '2']:
             raise ValueError
     except ValueError:
-        print("Error: Introdueix només un dels següents valors: 1, 2, 3.")
+        print("Error: Introdueix només un dels següents valors: 1, 2.")
         continue
     break
 
