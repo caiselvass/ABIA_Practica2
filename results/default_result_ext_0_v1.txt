@@ -1,0 +1,51 @@
+
+ff: parsing domain file
+domain 'READING_PLAN' defined
+ ... done.
+ff: parsing problem file
+problem 'GENERATED_PROBLEM_EXT_0_V1' defined
+ ... done.
+
+
+
+no optimization required. skipping criterion.
+
+
+no metric specified. plan length assumed.
+
+checking for cyclic := effects --- OK.
+
+ff: search configuration is EHC, if that fails then  best-first on 1*g(s) + 5*h(s) where
+    metric is  plan length
+
+Cueing down from goal distance:    6 into depth [1][2]
+                                   5            [1][2]
+                                   4            [1][2]
+                                   3            [1][2]
+                                   2            [1][2]
+                                   1            [1]
+                                   0            
+
+ff: found legal plan as follows
+
+step    0: ASSIGN_BOOK BOOK_1 JANUARY PAST
+        1: START_MONTH FEBRUARY JANUARY PAST
+        2: ASSIGN_BOOK BOOK_2 FEBRUARY JANUARY
+        3: START_MONTH MARCH FEBRUARY JANUARY
+        4: ASSIGN_BOOK BOOK_3 MARCH FEBRUARY
+        5: START_MONTH APRIL MARCH FEBRUARY
+        6: ASSIGN_BOOK BOOK_4 APRIL MARCH
+        7: START_MONTH MAY APRIL MARCH
+        8: ASSIGN_BOOK BOOK_5 MAY APRIL
+        9: START_MONTH JUNE MAY APRIL
+       10: ASSIGN_BOOK BOOK_6 JUNE MAY
+     
+
+time spent:    0.00 seconds instantiating 143 easy, 1183 hard action templates
+               0.01 seconds reachability analysis, yielding 227 facts and 1140 actions
+               0.00 seconds creating final representation with 206 relevant facts, 0 relevant fluents
+               0.00 seconds computing LNF
+               0.00 seconds building connectivity graph
+               0.00 seconds searching, evaluating 12 states, to a max depth of 2
+               0.01 seconds total time
+
