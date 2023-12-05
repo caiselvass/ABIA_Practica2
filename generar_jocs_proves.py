@@ -520,7 +520,7 @@ for i, test_graph in enumerate(graphs):
 							group_root = n
 							break
 					
-					if not group_root:
+					if group_root is None:
 						# Assignem un node aleatori com a root del grup
 						group_root = np.random.choice(list(group))
 			
