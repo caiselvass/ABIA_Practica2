@@ -4,7 +4,7 @@ import seaborn as sns
 
 while True:
     try:
-        experiment = input('Quin experiment vols representar? [1, 2]:')
+        experiment = input('Quin experiment vols representar? [1, 2]: ')
         if experiment not in ['1', '2']:
             raise ValueError
     except ValueError:
@@ -17,12 +17,12 @@ if experiment == '1':
 
     while True:
         try:
-            extensio: str = str(input('Quina extensió vols representar? [B, 1, 2, 3]:'))
+            extensio: str = str(input('Quina extensió vols representar? [B, 1]: '))
             extensio = 'B' if extensio == 'b' else extensio
-            if experiment not in ['B', '1', '2', '3']:
+            if experiment not in ['B', '1']:
                 raise ValueError
         except ValueError:
-            print("Error: Introdueix només un dels següents valors: B, 1, 2, 3.")
+            print("Error: Introdueix només un dels següents valors: B, 1.")
             continue
         break
         
