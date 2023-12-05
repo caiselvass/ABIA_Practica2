@@ -364,9 +364,9 @@ for i, test_graph in enumerate(graphs):
 					tmp_node2: Book = np.random.choice(np.array(tmp_addi_books))
 
 					if tmp_node1 != tmp_node2 \
-						and (tmp_node2, tmp_node1) not in test_graph.edges \
-							and not set(test_graph.predecessors(tmp_node1)):
-						added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_node2, v=tmp_node1, edge_name='predecessor', cycle_type='undirected')
+						and (tmp_node1, tmp_node2) not in test_graph.edges \
+							and not set(test_graph.predecessors(tmp_node2)):
+						added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_node1, v=tmp_node2, edge_name='predecessor', cycle_type='undirected')
 						if added:
 							tmp_added_predecessor += 1
 				
