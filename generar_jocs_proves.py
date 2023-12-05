@@ -359,6 +359,16 @@ for i, test_graph in enumerate(graphs):
 				# "Nivel básico: En el plan de lectura todos los libros tienen 0 o 1 predecesores y ningún paralelo.
 				# El planner es capaz de encontrar un plan para poder llegar a leer los libros objetivo encadenando
 				# libros, donde cada libro tiene solo uno o ningún predecesor."
+				while tmp_added_predecessor < edge_limit:
+					tmp_node1: Book = np.random.choice(np.array(tmp_addi_books))
+					tmp_node2: Book = np.random.choice(np.array(tmp_addi_books))
+
+					if tmp_node1 != tmp_node2 \
+						and not set(test_graph.predecessors(tmp_node1)):
+						added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_node2, v=tmp_node1, edge_name='predecessor', cycle_type='undirected')
+						if added:
+							tmp_added_predecessor += 1
+
 				for b in tmp_addi_books:
 					if tmp_added_predecessor >= edge_limit: # Un graf acíclic no pot tenir més arestes que nodes - 1
 						break
