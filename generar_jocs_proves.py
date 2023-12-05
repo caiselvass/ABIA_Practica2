@@ -217,7 +217,7 @@ while True:
 		for string in books_list:
 			if string not in set_strings_sagas:
 				raise ValueError
-		if len(books_list) == 1 and books_list[0] in {'HELP', 'help'}:
+		if 'HELP' in books_list or 'help' in books_list:
 			print(f"Pots escriure les següents paraules clau per incloure sagues famoses de llibres:\n\t* HP per incloure tots els {len(hp_books)} llibres de Harry Potter.\n\t* LR per incloure tots els {len(lr_books)} llibres del Senyor dels Anells (The Lord of the Rings).\n\t* HG per incloure tots els {len(hg_books)} llibres de la saga dels Jocs de la Fam (Hunger Games).")
 			if level >= 2:
 				print(f"\t* MV per incloure tots els {len(mv_books)} llibres inventats de la saga Marvel.")
@@ -246,29 +246,47 @@ while True:
 		num_addi_books: int = int(input("Introdueix el nombre de llibres addicionals que vols generar en els joc de proves: ").replace(' ', ''))
 		if num_addi_books < 0:
 			raise ValueError
+		elif (not num_addi_books) and (not books_list):
+			raise AssertionError
 	except ValueError:
 		print("Error: Introdueix un nombre enter >= 0.")
 		continue
-	break
-
-# Llegir tots els llibres o que sigui aleatori
-while True:
-	try:
-		read_all_books: Union[bool, str] = input("Vols llegir tots els llibres possibles (ALL) o que siguin triats aleatòriament (R)? [ALL/R]: ").replace(' ', '')
-		if read_all_books not in {'ALL', 'all', 'R', 'r'}:
-			raise ValueError
-		else:
-			if read_all_books in {'ALL', 'all'}:
-				read_all_books = True
-			else:
-				read_all_books = False
-	except ValueError:
-		print("Error: Introdueix només un dels següents valors: ALL, R.")
+	except AssertionError:
+		print("Error: No has inclòs cap saga famosa de llibres, així que has d'introduir un nombre enter >= 1 per evitar jocs de prova sense llibres.")
 		continue
 	break
 
+# Percentatge de predecessors i paral·lels
+if level >= 2 and num_addi_books > 1:
+	while True:
+		try:
+			proportion_parallels_str: str = input("Introdueix el percentatge de llibres paral·lels respecte els predecessors (HELP per més informació): ").replace(' ', '').replace(',', '.')
+			if proportion_parallels_str in {'HELP', 'help'}:
+				print("El percentatge que introdueixis determinarà la quantitat de llibres paral·lels respecte la quantitat de llibres predecessors. Aquest percentatge no es complirà de manera totalment estricte, però s'intentarà aproximar el màxim possible.")
+				continue
+			chosen_proportion_parallels: float = float(proportion_parallels_str)
+			if not (0 < chosen_proportion_parallels <= 100):
+				raise ValueError
+		except ValueError:
+			print("Error: Introdueix un nombre real en l'interval (0, 100].")
+			continue
+		chosen_proportion_parallels /= 100
+		break
+
+# Percentatge de llibres que s'han de llegir aleatòriament
+while True:
+	try:
+		proportion_to_read: float = float(input("Introdueix el percentatge de llibres que s'han de llegir aleatòriament: ").replace(' ', '').replace(',', '.'))
+		if not (0 < proportion_to_read <= 100):
+			raise ValueError
+	except ValueError:
+		print("Error: Introdueix un nombre real en l'interval (0, 100].")
+		continue
+	proportion_to_read /= 100
+	break
+
 # Llavor (seed) per generar les relacions entre els llibres addicionals
-if (not read_all_books) or (num_addi_books > 1):
+if num_addi_books > 1:
 	while True:
 		try:
 			seed: Union[None, int] = int(input("Introdueix la llavor (seed) per realitzar els processos aleatoris (0 per triar una llavor qualsevol): ").replace(' ', ''))
@@ -344,11 +362,16 @@ for i, test_graph in enumerate(graphs):
 				# capaz de construir un plan para poder llegar a leer los libros objetivo, donde para todo libro
 				# que pertenece al plan, todos sus libros paralelos pertenecen al plan y están en el mismo mes o
 				# en meses anteriores."
+				proportion_parallels: float = chosen_proportion_parallels # Restaurem el valor introduït per l'usuari
+				proportion_predecessors: float = max(0, 1 - proportion_parallels)
+				proportion_predecessors = round(proportion_predecessors / 2, 3)
+				proportion_parallels = round(proportion_parallels / 2, 3)
+
 				for b in tmp_addi_books:
 					if tmp_added_edges >= num_addi_books - 1: # Un graf acíclic no pot tenir més arestes que nodes - 1
 						break
 					for _ in range(np.random.randint(num_addi_books)):
-						random_value = np.random.choice(['predecessor', 'predecessor', 'predecessor', 'parallel', 'None', 'None', 'None', 'None']) # 3/8 de probabilitat de predecessor, 1/8 de probabilitat de parallel, 4/8 de probabilitat de no afegir aresta
+						random_value = np.random.choice(['predecessor', 'parallel', 'None'], p=[proportion_predecessors, proportion_parallels, round(1 - proportion_predecessors - proportion_parallels, 3)])
 						if random_value == 'predecessor':
 							while True:
 								tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
@@ -370,11 +393,17 @@ for i, test_graph in enumerate(graphs):
 			elif level == 3:
 				# Extensión 3: Los libros tienen además un número de páginas. El planificador controla que en
 				# el plan generado no se superen las 800 páginas al mes.
+				proportion_parallels: float = chosen_proportion_parallels # Restaurem el valor introduït per l'usuari
+				proportion_predecessors: float = max(0, 1 - proportion_parallels)
+				proportion_predecessors = round(proportion_predecessors / 2, 3)
+				proportion_parallels = round(proportion_parallels / 2, 3)
+				
+				print(f"\t* Percentatge de predecessors: {proportion_predecessors * 100}%\n\t* Percentatge de paral·lels: {proportion_parallels * 100}%\n\t* Percentatge de llibres sense aresta: {(1 - proportion_predecessors - proportion_parallels) * 100}%\n")
 				for b in tmp_addi_books:
 					if tmp_added_edges >= num_addi_books - 1: # Un graf acíclic no pot tenir més arestes que nodes - 1
 						break
 					for _ in range(np.random.randint(num_addi_books)):
-						random_value = np.random.choice(['predecessor', 'predecessor', 'predecessor', 'parallel', 'None', 'None', 'None', 'None']) # 3/8 de probabilitat de predecessor, 1/8 de probabilitat de parallel, 4/8 de probabilitat de no afegir aresta
+						random_value = np.random.choice(['predecessor', 'parallel', 'None'], p=[proportion_predecessors, proportion_parallels, round(1 - proportion_predecessors - proportion_parallels, 3)])
 						if random_value == 'predecessor':
 							while True:
 								tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
@@ -442,16 +471,8 @@ for i, test_graph in enumerate(graphs):
 			if test_graph.edges[e]['name'] == 'predecessor':
 				file.write(f'\t\t(predecessor {e[0]} {e[1]})\n')
 		
-		# Goal books
-		if read_all_books:
-			goal_books: set = set(test_graph.nodes)
-		else:
-			pc_min: float = 0.2
-			pc_max: float = 0.3
-			min_goal_books: int = int(round(len(list(test_graph.nodes)) * pc_min, 0)) # Mínim 20% dels llibres
-			max_goal_books: int = int(round(len(list(test_graph.nodes)) * pc_max, 0)) if int(round(len(list(test_graph.nodes)) * pc_max, 0)) > min_goal_books else int(round(len(list(test_graph.nodes)) * pc_max, 0) + 1) # Màxim 30% dels llibres (+ 1 en cas de ser igual que min_goal_books)
-			
-			goal_books: set = set(np.random.choice(list(test_graph.nodes), size=np.random.randint(min_goal_books, max_goal_books), replace=False))
+		# Goal books			
+		goal_books: set = set(np.random.choice(list(test_graph.nodes), size=int(max(1, round(test_graph.number_of_nodes() * proportion_to_read, 0))), replace=False))
 		
 		if level >= 2:
 			# Parallels
@@ -477,11 +498,11 @@ for i, test_graph in enumerate(graphs):
 			file.write(f'\t\t(goal_book {b})\n')
 
 		# Read books
-		if not read_all_books:
-			remaining_books: set = set(test_graph.nodes) - goal_books # No podem haver llegit llibres que ens volem llegir en un futur (seria una contradicció)
-			num_remaining_books: int = len(remaining_books)
+		remaining_books: set = set(test_graph.nodes) - goal_books # No podem haver llegit llibres que ens volem llegir en un futur (seria una contradicció)
+		num_remaining_books: int = len(remaining_books)
+		if num_remaining_books > 0:
 			file.write('\t\t;;Books the user has already read\n')
-			for b in set(np.random.choice(list(remaining_books), size=np.random.randint(min(1, num_remaining_books), num_remaining_books + 1), replace=False)):
+			for b in set(np.random.choice(list(remaining_books), size=np.random.randint(max(1, num_remaining_books), num_remaining_books + 1), replace=False)):
 				file.write(f'\t\t(read {b})\n')
 				file.write(f'\t\t(assigned {b} Past)\n')
 
@@ -521,7 +542,7 @@ while True:
 			raise ValueError
 		else:
 			if execute_planner in {'HELP', 'help'}:
-				print("L'execució automàtica només està disponible per Sistemes Operatius Windows (amb Powershell instal·lat) o MacOS (amb Xcode instal·lat). Es realitzarà amb els següents programes proporcionats per realitzar la pràcitca:\n\t* Windows: metricff.\n\t* MacOS: ff.\n\nSi voleu executar el planner manualment, executeu la següent comanda:\n\t* Windows:\n\t\t>>> powershell\n\t\t>>> ./executables/windows/metricff -o ./domains/default_domain_ext_X.pddl -f ./problems/generated_problem_ext_X_Y.pddl\n\t* MacOS:\n\t\t >>> ./executables/macos/ff -o ./domains/default_domain_ext_X.pddl -f ./problems/default_problem_ext_X_Y.pddl\n\n\tOn X és el nivell d'extensió del joc de proves que voleu executar i Y és el número del joc de proves que voleu executar. Els resultats de l'execució es guardaran a la carpeta 'results'.")			
+				print("L'execució automàtica només està disponible per Sistemes Operatius Windows (amb Powershell instal·lat) o MacOS (amb Xcode instal·lat). Es realitzarà amb els següents programes proporcionats per realitzar la pràcitca:\n\t* Windows: metricff.\n\t* MacOS: ff.\n\nSi voleu executar el planner manualment, executeu la següent comanda:\n\t* Windows:\n\t\t>>> powershell\n\t\t>>> ./executables/windows/metricff -o ./domains/default_domain_ext_X.pddl -f ./problems/generated_problem_ext_X_vY.pddl\n\t* MacOS:\n\t\t >>> ./executables/macos/ff -o ./domains/default_domain_ext_X.pddl -f ./problems/default_problem_ext_X_vY.pddl\n\n\tOn X és el nivell d'extensió del joc de proves que voleu executar i Y és el número del joc de proves que voleu executar. Els resultats de l'execució es guardaran a la carpeta 'results'.")			
 				continue
 			elif execute_planner in {'Y', 'y'}:
 				execute_planner = True
