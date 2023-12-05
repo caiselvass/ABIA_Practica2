@@ -36,7 +36,7 @@
 		(goal_book Book_6)
 		(goal_book Book_15)
 		;;Initialize num_months_created
-		(= (num_months_created) 0)
+		(= (num_months_created) 1)
 	)
 	;;Goal
 	(:goal

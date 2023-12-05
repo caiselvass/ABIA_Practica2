@@ -99,6 +99,17 @@ def parallel_chained_nodes(graph: nx.DiGraph, initial_node: Book) -> tuple:
 
 	return tuple(list_visited)
 
+def is_semi_goal(graph: nx.DiGraph, node: Book, goal_books: set) -> bool:
+	"""
+	Retorna True si el node és un node goal o "semi_goal" (un node que té un predecessor que és un node objectiu), False en cas contrari.
+	"""
+	predecessors = [u for u, v, attr in graph.in_edges(node, data=True) if attr.get('name') == 'predecessor']
+
+	for predecessor in predecessors:
+		if predecessor in goal_books:
+			return True
+	
+	return any(goal_or_semi_goal(graph, predecessor, goal_books) for predecessor in predecessors)
 
 # Nivell d'extensió dels jocs de proves
 while True:
@@ -480,13 +491,31 @@ for i, test_graph in enumerate(graphs):
 			file.write('\t\t;;Parallels\n')
 			for n in set(test_graph.nodes):
 				parallel_groups.add(parallel_chained_nodes(graph=test_graph, initial_node=n))
-			
+
 			for group in parallel_groups:
-				group_root = list(group)[0]
+				group_root: Union[Book, None] = None
 				for n in group:
 					if n in goal_books:
 						group_root = n
 						break
+				
+				if group_root is None:
+					# Busquem un node "semi_goal"
+					for n in group:
+						if n in test_graph.neighbors(goal_books):
+							group_root = n
+							break
+				
+				if not group_root:
+					# Busquem un node que tingui un predecessor que sigui un node "semi_goal"
+					for n in group:
+						if is_semi_goal(graph=test_graph, node=n, goal_books=goal_books):
+							group_root = n
+							break
+					
+					if not group_root:
+						# Assignem un node aleatori com a root del grup
+						group_root = np.random.choice(list(group))
 			
 				for n in group:
 					if n != group_root:

@@ -1,0 +1,70 @@
+
+ff: parsing domain file
+domain 'READING_PLAN' defined
+ ... done.
+ff: parsing problem file
+problem 'GENERATED_PROBLEM_EXT_0_V1' defined
+ ... done.
+
+
+
+no optimization required. skipping criterion.
+
+
+no metric specified. plan length assumed.
+
+checking for cyclic := effects --- OK.
+
+ff: search configuration is EHC, if that fails then  best-first on 1*g(s) + 5*h(s) where
+    metric is  plan length
+
+Cueing down from goal distance:   10 into depth [1]
+                                   9            [1]
+                                   8            [1]
+                                   7            [1]
+                                   6            [1]
+                                   5            [1][2]
+                                   4            [1][2] --- pruning stopped --- [1][2][3]
+
+Enforced Hill-climbing failed !
+switching to Best-first Search now.
+
+
+advancing to distance:   10
+                          9
+                          8
+                          7
+                          6
+                          5
+                          4
+                          3
+                          2
+                          1
+                          0
+
+ff: found legal plan as follows
+
+step    0: ASSIGN_BOOK BOOK_1 JANUARY PAST
+        1: ASSIGN_BOOK BOOK_2 JANUARY PAST
+        2: START_MONTH FEBRUARY JANUARY PAST
+        3: ASSIGN_BOOK BOOK_3 FEBRUARY JANUARY
+        4: START_MONTH MARCH FEBRUARY JANUARY
+        5: ASSIGN_BOOK BOOK_4 MARCH FEBRUARY
+        6: START_MONTH APRIL MARCH FEBRUARY
+        7: ASSIGN_BOOK BOOK_7 APRIL MARCH
+        8: ASSIGN_BOOK BOOK_8 APRIL MARCH
+        9: ASSIGN_BOOK BOOK_9 APRIL MARCH
+       10: ASSIGN_BOOK BOOK_10 APRIL MARCH
+       11: ASSIGN_BOOK BOOK_5 APRIL MARCH
+       12: START_MONTH MAY APRIL MARCH
+       13: ASSIGN_BOOK BOOK_6 MAY APRIL
+     
+
+time spent:    0.09 seconds instantiating 143 easy, 16224 hard action templates
+               0.01 seconds reachability analysis, yielding 416 facts and 4260 actions
+               0.00 seconds creating final representation with 388 relevant facts, 1 relevant fluents
+               0.01 seconds computing LNF
+               0.00 seconds building connectivity graph
+               0.45 seconds searching, evaluating 2893 states, to a max depth of 3
+               0.56 seconds total time
+

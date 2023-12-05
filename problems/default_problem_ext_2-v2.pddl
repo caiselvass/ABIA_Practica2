@@ -16,22 +16,25 @@
 		(current_month January)
 		(previous_month Past)
 		;;Predecessors
-		(predecessor Book_1 Book_2)
-		(predecessor Book_2 Book_3)
-		(predecessor Book_3 Book_4)
-		(predecessor Book_4 Book_5)
-        (predecessor Book_5 Book_11)
-		(predecessor Book_6 Book_11)
-		(predecessor Book_7 Book_11)
-		(predecessor Book_8 Book_11)
-		(predecessor Book_9 Book_11)
+		(parallel Book_1 Book_2)
+		(parallel Book_1 Book_3)
+		(parallel Book_1 Book_4)
+		(parallel Book_1 Book_5)
+		(parallel Book_1 Book_6)
+		
+		(parallel Book_10 Book_7)
+		(parallel Book_10 Book_8)
+		(parallel Book_10 Book_9)
+
 		(predecessor Book_10 Book_11)
 		(predecessor Book_11 Book_12)
 		(predecessor Book_12 Book_13)
 		(predecessor Book_13 Book_14)
 		(predecessor Book_14 Book_15)
 		;;Books the user would like to read
-		(goal_book Book_12)
+		(goal_book Book_1)
+		(goal_book Book_15)
+
 		;;Initialize num_months_created
 		(= (num_months_created) 1)
 	)
