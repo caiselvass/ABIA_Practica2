@@ -1,0 +1,82 @@
+
+ff: parsing domain file
+domain 'READING_PLAN' defined
+ ... done.
+ff: parsing problem file
+problem 'GENERATED_PROBLEM_EXT_0_V1' defined
+ ... done.
+
+
+
+no optimization required. skipping criterion.
+
+
+no metric specified. plan length assumed.
+
+checking for cyclic := effects --- OK.
+
+ff: search configuration is EHC, if that fails then  best-first on 1*g(s) + 5*h(s) where
+    metric is  plan length
+
+Cueing down from goal distance:   15 into depth [1]
+                                  14            [1][2]
+                                  13            [1]
+                                  12            [1]
+                                  11            [1][2] --- pruning stopped --- [1][2]
+
+Enforced Hill-climbing failed !
+switching to Best-first Search now.
+
+
+advancing to distance:   15
+                         14
+                         13
+                         12
+                         11
+                         10
+                          9
+                          8
+                          7
+                          6
+                          5
+                          4
+                          3
+                          2
+                          1
+                          0
+
+ff: found legal plan as follows
+
+step    0: ASSIGN_BOOK BOOK_9 JANUARY PAST
+        1: ASSIGN_BOOK BOOK_7 JANUARY PAST
+        2: START_MONTH FEBRUARY JANUARY PAST
+        3: ASSIGN_BOOK BOOK_8 FEBRUARY JANUARY
+        4: ASSIGN_BOOK BOOK_10 FEBRUARY JANUARY
+        5: START_MONTH MARCH FEBRUARY JANUARY
+        6: ASSIGN_BOOK BOOK_3 MARCH FEBRUARY
+        7: ASSIGN_BOOK BOOK_5 MARCH FEBRUARY
+        8: ASSIGN_BOOK BOOK_6 MARCH FEBRUARY
+        9: START_MONTH APRIL MARCH FEBRUARY
+       10: ASSIGN_BOOK BOOK_2 APRIL MARCH
+       11: ASSIGN_BOOK BOOK_4 APRIL MARCH
+       12: ASSIGN_BOOK BOOK_1 APRIL MARCH
+       13: START_MONTH MAY APRIL MARCH
+       14: ASSIGN_BOOK BOOK_11 MAY APRIL
+       15: START_MONTH JUNE MAY APRIL
+       16: ASSIGN_BOOK BOOK_12 JUNE MAY
+       17: START_MONTH JULY JUNE MAY
+       18: ASSIGN_BOOK BOOK_13 JULY JUNE
+       19: START_MONTH AUGUST JULY JUNE
+       20: ASSIGN_BOOK BOOK_14 AUGUST JULY
+       21: START_MONTH SEPTEMBER AUGUST JULY
+       22: ASSIGN_BOOK BOOK_15 SEPTEMBER AUGUST
+     
+
+time spent:    0.24 seconds instantiating 143 easy, 47827 hard action templates
+               0.02 seconds reachability analysis, yielding 429 facts and 7308 actions
+               0.01 seconds creating final representation with 414 relevant facts, 25 relevant fluents
+               0.04 seconds computing LNF
+               0.03 seconds building connectivity graph
+               1.64 seconds searching, evaluating 791 states, to a max depth of 2
+               1.98 seconds total time
+

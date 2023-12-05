@@ -442,6 +442,8 @@ for i, test_graph in enumerate(graphs):
 
 # Mostra els grafs de cada joc de proves
 list_goal_books: list[set] = []
+list_read_books: list[set] = []
+
 for i, test_graph in enumerate(graphs):
 	print(f"\n\n********** JOC DE PROVES {i+1} **********\n")
 	print(f"\t* {len(test_graph.nodes)} NODES: {[(n.name, n.pages) if n.pages is not None else n.name for n in list(test_graph.nodes)]}\n")
@@ -449,11 +451,14 @@ for i, test_graph in enumerate(graphs):
 	print(f"\t* {len(list(e for e in test_graph.edges if test_graph.edges[e]['name'] == 'parallel'))} ARESTES 'PARALLEL': {list(f'({e[0]} -> {e[1]})' for e in test_graph.edges if test_graph.edges[e]['name'] == 'parallel')}\n")
 
 	list_goal_books.append(set(np.random.choice(list(test_graph.nodes), size=int(max(1, round(test_graph.number_of_nodes() * proportion_to_read, 0))), replace=False)))
+	tmp_remaining_books: set = set(test_graph.nodes) - list_goal_books[i] # No podem haver llegit llibres que ens volem llegir en un futur (seria una contradicció)
+	tmp_num_remaining_books: int = len(tmp_remaining_books)
+	list_read_books.append(set(np.random.choice(list(tmp_remaining_books), size=np.random.randint(max(1, tmp_num_remaining_books), tmp_num_remaining_books + 1), replace=False)))
 
 	edge_colors: list = ['lightblue' if test_graph.edges[e]['name'] == 'predecessor' else 'red' for e in test_graph.edges]
-	node_colors: list = ['lightgray' if n not in list_goal_books[i] else '#b8e6c4' for n in test_graph.nodes]
+	node_colors: list = ['#b8e6c4' if n in list_goal_books[i] else ('#f5c8a6' if n in list_read_books[i] else 'lightgray') for n in test_graph.nodes]
 
-	nx.draw(test_graph, with_labels=True, node_color=node_colors, edge_color=edge_colors, node_size=250, arrowstyle='->', arrowsize=35, font_size=8)
+	nx.draw(test_graph, pos=nx.spring_layout(test_graph) ,with_labels=True, node_color=node_colors, edge_color=edge_colors, node_size=250, arrowstyle='->', arrowsize=35, font_size=8)
 	plt.show()
 
 # Generació dels jocs de proves
@@ -492,6 +497,7 @@ for i, test_graph in enumerate(graphs):
 		
 		#Goal books
 		goal_books: set = list_goal_books[i]
+		read_books: set = list_read_books[i]
 
 		if level >= 2:
 			# Parallels
@@ -535,11 +541,9 @@ for i, test_graph in enumerate(graphs):
 			file.write(f'\t\t(goal_book {b})\n')
 
 		# Read books
-		remaining_books: set = set(test_graph.nodes) - goal_books # No podem haver llegit llibres que ens volem llegir en un futur (seria una contradicció)
-		num_remaining_books: int = len(remaining_books)
-		if num_remaining_books > 0:
+		if list_read_books:
 			file.write('\t\t;;Books the user has already read\n')
-			for b in set(np.random.choice(list(remaining_books), size=np.random.randint(max(1, num_remaining_books), num_remaining_books + 1), replace=False)):
+			for b in read_books:
 				file.write(f'\t\t(read {b})\n')
 				file.write(f'\t\t(assigned {b} Past)\n')
 
