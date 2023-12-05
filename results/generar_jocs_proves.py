@@ -114,7 +114,7 @@ def is_semi_goal(graph: nx.DiGraph, node: Book, goal_books: set) -> bool:
 # Nivell d'extensió dels jocs de proves
 while True:
 	try:
-		level = input("Introdueix el nivell d'extensio dels jocs de proves que vols generar [B/1/2/3]: ").replace(' ', '')
+		level = input("\nIntrodueix el nivell d'extensio dels jocs de proves que vols generar [B/1/2/3]: ").replace(' ', '')
 		if level not in {'B', 'b', '1', '2', '3'}:
 			raise ValueError
 		else:
@@ -130,7 +130,7 @@ while True:
 # Nombre de jocs de proves a generar
 while True:
 	try:
-		n_tests: int = int(input(f"Introdueix el nombre de jocs de proves amb nivell d'extensió '{'B' if level == 0 else level}' que vols generar: ").replace(' ', ''))
+		n_tests: int = int(input(f"\nIntrodueix el nombre de jocs de proves amb nivell d'extensió '{'B' if level == 0 else level}' que vols generar: ").replace(' ', ''))
 		if n_tests < 1:
 			raise ValueError
 	except ValueError:
@@ -224,7 +224,7 @@ while True:
 	set_strings_sagas: set[str] = {'HP', 'hp', 'LR', 'lr', 'HG', 'hg', 'HELP', 'help', ''} if level < 2 else {'HP', 'hp', 'LR', 'lr', 'HG', 'hg', 'MV', 'mv', 'HELP', 'help', ''}
 	options_str: str = 'HP/LR/HG/HELP' if level < 2 else 'HP/LR/HG/MV/HELP'
 	try:
-		books_list: list[str] = input(f"Introdueix les paraules clau de les sagues famoses de llibres separades per comes. Deixa-ho en blanc (buit) si no en vols incloure cap. (HELP per més informació) [{options_str}]:\n").replace(' ', '').split(',')
+		books_list: list[str] = input(f"\nIntrodueix les paraules clau de les sagues famoses de llibres separades per comes. Deixa-ho en blanc (buit) si no en vols incloure cap. (HELP per més informació) [{options_str}]:\n").replace(' ', '').split(',')
 		for string in books_list:
 			if string not in set_strings_sagas:
 				raise ValueError
@@ -254,7 +254,7 @@ while True:
 # Nombre de llibres addicionals
 while True:
 	try:
-		num_addi_books: int = int(input("Introdueix el nombre de llibres addicionals que vols generar en els joc de proves: ").replace(' ', ''))
+		num_addi_books: int = int(input("\nIntrodueix el nombre de llibres addicionals que vols generar en els joc de proves: ").replace(' ', ''))
 		if num_addi_books < 0:
 			raise ValueError
 		elif (not num_addi_books) and (not books_list):
@@ -267,27 +267,46 @@ while True:
 		continue
 	break
 
+# Pergentatge total d'arestes afegides al graf
+while True:
+	try:
+		proportion_edges_str: str = input("\nIntrodueix el percentatge de relacions entre llibres (arestes entre nodes) que vols afegir respecte el total possible (HELP per més informació): ").replace(' ', '').replace(',', '.')
+		if proportion_edges_str in {'HELP', 'help'}:
+			print(f"El percentatge que introdueixis determinarà la quantitat d'arestes que tindrà el graf del joc de proves. És a dir, el nombre de relacions 'predecessor' + 'parallel'. En aquest cas tenim {num_addi_books} nodes, de manera que el total de relacions entre llibres possibles (el 100%) és {num_addi_books - 1}.")
+			continue
+		chosen_proportion_edges: float = float(proportion_edges_str)
+		if not (0 <= chosen_proportion_edges <= 100):
+			raise ValueError
+	except ValueError:
+		print("Error: Introdueix un nombre real en l'interval [0, 100].")
+		continue
+	chosen_proportion_edges /= 100
+	edge_limit: int = int(round((num_addi_books - 1) * chosen_proportion_edges, 0)) # Com a màxim serà N - 1, on N és el nombre de node (ja que el graf és acíclic)
+	break
+
 # Percentatge de predecessors i paral·lels
 if level >= 2 and num_addi_books > 1:
 	while True:
 		try:
-			proportion_parallels_str: str = input("Introdueix el percentatge de llibres paral·lels respecte els predecessors (HELP per més informació): ").replace(' ', '').replace(',', '.')
+			proportion_parallels_str: str = input("\nIntrodueix el percentatge de relacions entre llibres que desitjes que siguin del tipus 'parallel'. La resta de relacions seran del tipus 'predecessor' (HELP per més informació): ").replace(' ', '').replace(',', '.')
 			if proportion_parallels_str in {'HELP', 'help'}:
-				print("El percentatge que introdueixis determinarà la quantitat de llibres paral·lels respecte la quantitat de llibres predecessors. Aquest percentatge no es complirà de manera totalment estricte, però s'intentarà aproximar el màxim possible.")
+				print(f"El percentatge que introdueixis determinarà, dins del {round(chosen_proportion_edges * 100, 2)}% de relacions que has decidit afegir en la pregunta anterior, quina quantitat seran 'parallel' i quina 'predecessor'. El percentatge de 'predecessor' es determina aleatòriament amb l'operació 100 - X, on X és el percentatge de relacions 'parallel' (el que has de respondre en aquesta pregunta).")
 				continue
 			chosen_proportion_parallels: float = float(proportion_parallels_str)
-			if not (0 < chosen_proportion_parallels <= 100):
+			if not (0 <= chosen_proportion_parallels <= 100):
 				raise ValueError
 		except ValueError:
-			print("Error: Introdueix un nombre real en l'interval (0, 100].")
+			print("Error: Introdueix un nombre real en l'interval [0, 100].")
 			continue
 		chosen_proportion_parallels /= 100
+		parallel_limit: int = int(round(edge_limit * chosen_proportion_parallels, 0))
+		predecessor_limit: int = int(round(edge_limit * (1 - chosen_proportion_parallels), 0))
 		break
 
 # Percentatge de llibres que s'han de llegir aleatòriament
 while True:
 	try:
-		proportion_to_read: float = float(input("Introdueix el percentatge de llibres que s'han de llegir aleatòriament: ").replace(' ', '').replace(',', '.'))
+		proportion_to_read: float = float(input("\nIntrodueix el percentatge de llibres que s'hauran de llegir respecte el total (determinats aleatòriament): ").replace(' ', '').replace(',', '.'))
 		if not (0 < proportion_to_read <= 100):
 			raise ValueError
 	except ValueError:
@@ -300,7 +319,7 @@ while True:
 if num_addi_books > 1:
 	while True:
 		try:
-			seed: Union[None, int] = int(input("Introdueix la llavor (seed) per realitzar els processos aleatoris (0 per triar una llavor qualsevol): ").replace(' ', ''))
+			seed: Union[None, int] = int(input("\nIntrodueix la llavor (seed) per realitzar els processos aleatoris (0 per triar una llavor qualsevol): ").replace(' ', ''))
 			if seed < 0:
 				raise ValueError
 			elif seed == 0:
@@ -333,14 +352,15 @@ for i, test_graph in enumerate(graphs):
 		
 		# Afegir les arestes (predecessor/parallel) als llibres addicionals (només en cas que n'hi hagi més d'un) 
 		if num_addi_books > 1:
-			tmp_added_edges: int = 0
+			tmp_added_predecessor: int = 0
+			tmp_added_parallel: int = 0
 
 			if level == 0:
 				# "Nivel básico: En el plan de lectura todos los libros tienen 0 o 1 predecesores y ningún paralelo.
 				# El planner es capaz de encontrar un plan para poder llegar a leer los libros objetivo encadenando
 				# libros, donde cada libro tiene solo uno o ningún predecesor."
 				for b in tmp_addi_books:
-					if tmp_added_edges >= num_addi_books - 1: # Un graf acíclic no pot tenir més arestes que nodes - 1
+					if tmp_added_predecessor >= edge_limit: # Un graf acíclic no pot tenir més arestes que nodes - 1
 						break
 					if np.random.choice([True, False]):
 						while True:
@@ -349,93 +369,76 @@ for i, test_graph in enumerate(graphs):
 								break
 						added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
 						if added:
-							tmp_added_edges += 1
+							tmp_added_predecessor += 1
 				
 			elif level == 1:
 				# "Extensión 1: Los libros pueden tener de 0 a N predecesores pero ningún paralelo. El planner
 				# es capaz de construir un plan para poder llegar a leer los libros objetivo, donde para todo
 				# libro que pertenece al plan, todos sus libros predecesores pertenecen al plan y están en meses anteriores."
-				for b in tmp_addi_books:
-					if tmp_added_edges >= num_addi_books - 1: # Un graf acíclic no pot tenir més arestes que nodes - 1
-						break
-					for _ in range(np.random.randint(num_addi_books)):
-						if np.random.choice([True, False]):
-							while True:
-								tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
-								if tmp_pred != b:
-									break
-							added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
-							if added:
-								tmp_added_edges += 1
+				while tmp_added_predecessor < edge_limit:
+					tmp_node1: Book = np.random.choice(np.array(tmp_addi_books))
+					tmp_node2: Book = np.random.choice(np.array(tmp_addi_books))
+
+					if tmp_node1 != tmp_node2:
+						added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_node1, v=tmp_node2, edge_name='predecessor', cycle_type='undirected')
+						if added:
+							tmp_added_predecessor += 1
 
 			elif level == 2:
 				# "Extensión 2: Extensión 1 + los libros pueden tener de 0 a M libros paralelos. El planner es
 				# capaz de construir un plan para poder llegar a leer los libros objetivo, donde para todo libro
 				# que pertenece al plan, todos sus libros paralelos pertenecen al plan y están en el mismo mes o
 				# en meses anteriores."
-				proportion_parallels: float = chosen_proportion_parallels # Restaurem el valor introduït per l'usuari
-				proportion_predecessors: float = max(0, 1 - proportion_parallels)
-				proportion_predecessors = round(proportion_predecessors / 2, 3)
-				proportion_parallels = round(proportion_parallels / 2, 3)
 
-				for b in tmp_addi_books:
-					if tmp_added_edges >= num_addi_books - 1: # Un graf acíclic no pot tenir més arestes que nodes - 1
-						break
-					for _ in range(np.random.randint(num_addi_books)):
-						random_value = np.random.choice(['predecessor', 'parallel', 'None'], p=[proportion_predecessors, proportion_parallels, round(1 - proportion_predecessors - proportion_parallels, 3)])
-						if random_value == 'predecessor':
-							while True:
-								tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
-								if tmp_pred != b:
-									break
-							added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
+				# Predecessors
+				while tmp_added_predecessor < predecessor_limit:
+					tmp_node1: Book = np.random.choice(np.array(tmp_addi_books))
+					tmp_node2: Book = np.random.choice(np.array(tmp_addi_books))
+
+					if tmp_node1 != tmp_node2:
+						added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_node1, v=tmp_node2, edge_name='predecessor', cycle_type='undirected')
+						if added:
+							tmp_added_predecessor += 1
+					
+				# Parallels
+				while tmp_added_parallel < parallel_limit:
+					tmp_node1: Book = np.random.choice(np.array(tmp_addi_books))
+					tmp_node2: Book = np.random.choice(np.array(tmp_addi_books))
+
+					if tmp_node1 != tmp_node2:
+						if tmp_node2 not in test_graph.neighbors(tmp_node1):
+							added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_node1, v=tmp_node2, edge_name='parallel', cycle_type='undirected')
 							if added:
-								tmp_added_edges += 1
-						elif random_value == 'parallel':
-							while True:
-								tmp_parallel: Book = np.random.choice(np.array(tmp_addi_books))
-								if tmp_parallel != b:
-									break
-							if tmp_parallel not in test_graph.neighbors(b):
-								added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_parallel, v=b, edge_name='parallel', cycle_type='undirected')
-								if added:
-									tmp_added_edges += 1
+								tmp_added_parallel += 1
 			
 			elif level == 3:
 				# Extensión 3: Los libros tienen además un número de páginas. El planificador controla que en
 				# el plan generado no se superen las 800 páginas al mes.
-				proportion_parallels: float = chosen_proportion_parallels # Restaurem el valor introduït per l'usuari
-				proportion_predecessors: float = max(0, 1 - proportion_parallels)
-				proportion_predecessors = round(proportion_predecessors / 2, 3)
-				proportion_parallels = round(proportion_parallels / 2, 3)
+
+				# Predecessors
+				while tmp_added_predecessor < predecessor_limit:
+					tmp_node1: Book = np.random.choice(np.array(tmp_addi_books))
+					tmp_node2: Book = np.random.choice(np.array(tmp_addi_books))
+
+					if tmp_node1 != tmp_node2:
+						added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_node1, v=tmp_node2, edge_name='predecessor', cycle_type='undirected')
+						if added:
+							tmp_added_predecessor += 1
 				
-				print(f"\t* Percentatge de predecessors: {proportion_predecessors * 100}%\n\t* Percentatge de paral·lels: {proportion_parallels * 100}%\n\t* Percentatge de llibres sense aresta: {(1 - proportion_predecessors - proportion_parallels) * 100}%\n")
-				for b in tmp_addi_books:
-					if tmp_added_edges >= num_addi_books - 1: # Un graf acíclic no pot tenir més arestes que nodes - 1
-						break
-					for _ in range(np.random.randint(num_addi_books)):
-						random_value = np.random.choice(['predecessor', 'parallel', 'None'], p=[proportion_predecessors, proportion_parallels, round(1 - proportion_predecessors - proportion_parallels, 3)])
-						if random_value == 'predecessor':
-							while True:
-								tmp_pred: Book = np.random.choice(np.array(tmp_addi_books))
-								if tmp_pred != b:
-									break
-							added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_pred, v=b, edge_name='predecessor', cycle_type='undirected')
-							if added:
-								tmp_added_edges += 1
-						elif random_value == 'parallel':
-							while True:
-								tmp_parallel: Book = np.random.choice(np.array(tmp_addi_books))
-								if tmp_parallel != b:
-									break
-							# Comprova que la suma de les pàgines dels llibres paral·lels no superi les 1600 pàgines (2 mesos amb un màxim de 800 pàgines cada mes)
-							# Comprova que estiguin en un grup de paral·lels diferent. Si estan en el mateix grup, no cal afegir l'aresta perquè ja són paral·lels.
-							if parallel_chained_nodes(graph=test_graph, initial_node=b) != parallel_chained_nodes(graph=test_graph, initial_node=tmp_parallel):
-								if tmp_parallel not in test_graph.neighbors(b) \
-									and (sum(p1.pages for p1 in parallel_chained_nodes(graph=test_graph, initial_node=b)) + sum(p2.pages for p2 in parallel_chained_nodes(graph=test_graph, initial_node=tmp_parallel))) <= 1600:
-									added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_parallel, v=b, edge_name='parallel', cycle_type='undirected')
-									if added:
-										tmp_added_edges += 1
+				# Parallels 
+				while tmp_added_parallel < parallel_limit:
+					tmp_node1: Book = np.random.choice(np.array(tmp_addi_books))
+					tmp_node2: Book = np.random.choice(np.array(tmp_addi_books))
+
+					if tmp_node1 != tmp_node2:
+						# Comprova que la suma de les pàgines dels llibres paral·lels no superi les 1600 pàgines (2 mesos amb un màxim de 800 pàgines cada mes)
+						# Comprova que estiguin en un grup de paral·lels diferent. Si estan en el mateix grup, no cal afegir l'aresta perquè ja són paral·lels.
+						if parallel_chained_nodes(graph=test_graph, initial_node=tmp_node1) != parallel_chained_nodes(graph=test_graph, initial_node=tmp_node2):
+							if tmp_node2 not in test_graph.neighbors(tmp_node1) \
+								and (sum(p1.pages for p1 in parallel_chained_nodes(graph=test_graph, initial_node=tmp_node1)) + sum(p2.pages for p2 in parallel_chained_nodes(graph=test_graph, initial_node=tmp_node2))) <= 1600:
+								added: bool = add_edge_if_no_cycle(graph=test_graph, u=tmp_node1, v=tmp_node2, edge_name='parallel', cycle_type='undirected')
+								if added:
+									tmp_added_parallel += 1
 
 # Mostra els grafs de cada joc de proves
 list_goal_books: list[set] = []
@@ -571,7 +574,7 @@ for i, test_graph in enumerate(graphs):
 # Pregunta a l'usuari si vol executar el planner
 while True:
 	try:
-		execute_planner: Union[bool, str] = input("Vols executar automàticament el planner per tots els jocs de prova generats? (HELP per més informació) [Y/N/HELP]: ").replace(' ', '')
+		execute_planner: Union[bool, str] = input("\nVols executar automàticament el planner per tots els jocs de prova generats? (HELP per més informació) [Y/N/HELP]: ").replace(' ', '')
 		if execute_planner not in {'Y', 'y', 'N', 'n', 'HELP', 'help'}:
 			raise ValueError
 		else:
@@ -593,7 +596,7 @@ if execute_planner:
 	
 	while True:
 		try:
-			optimize_months = input("Vols aplicar l'optimitzador de nombre de mesos? (HELP per més informació) [Y/N/HELP]: ").replace(' ', '')
+			optimize_months = input("\nVols aplicar l'optimitzador de nombre de mesos? (HELP per més informació) [Y/N/HELP]: ").replace(' ', '')
 			if optimize_months not in {'Y', 'y', 'N', 'n', 'HELP', 'help'}:
 				raise ValueError
 			else:
