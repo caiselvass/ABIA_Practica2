@@ -1,22 +1,21 @@
-# AI Planning with PDDL: Python Execution Guide
+# AI Planning with PDDL: Python Execution Guide for Book Reading Planning
 
 ## Project Overview
-This project demonstrates the use of Planning Domain Definition Language (PDDL) in AI for planning and executing tasks. It showcases the development and execution of planning algorithms tailored for various test scenarios.
+This project leverages Planning Domain Definition Language (PDDL) for AI planning to optimize the reading schedule of books over a year. The objective is to balance the number of pages read each month, not exceeding 800 pages, while adhering to constraints related to book reading order. Some books have predecessors that must be read before others, and there are parallel reads that should be completed within a month of each other, adding complexity to the planning process.
 
 ## Directory Structure and Requirements
-The correct functioning of Python scripts relies on the integrity of the directory structure within `ABIA_Practica2_Roger_Cai_Pau`. Do not modify any directories or files in this directory to ensure the scripts run as expected.
+The proper functioning of Python scripts depends on the unaltered structure of the `ABIA_Practica2_Roger_Cai_Pau` directory. Modifying any files or directories within it may affect the execution of the Python scripts.
 
 ### Execution Instructions
 
-1. **generate_test_cases.py**: This script interacts with the user through terminal prompts to generate and execute test cases. Type "HELP" in response to any question for additional information. While this is primarily for Windows and MacOS, Linux users should perform execution manually.
+1. **generate_test_cases.py**: Generates and executes test cases through terminal prompts. For additional command information, type "HELP" in response to the prompts. This script is tailored for Windows and MacOS, with manual execution required on Linux.
 
-2. **generate_plots_experiments.py**: Generates plots from experiment data located in `ABIA_Practica2_Roger_Cai_Pau/experiments/data`. No need to run this script if you only want to view plots, as they are pre-generated in `ABIA_Practica2_Roger_Cai_Pau/experiments/plots`.
+2. **generate_plots_experiments.py**: This script generates plots from the data in `ABIA_Practica2_Roger_Cai_Pau/experiments/data`. The plots are already available in `ABIA_Practica2_Roger_Cai_Pau/experiments/plots` and do not require script execution to view.
 
 ### Recommendations
 
-- Execute Python scripts from the `ABIA_Practica2_Roger_Cai_Pau` directory using Visual Studio Code for optimal compatibility, as the development was done under these conditions.
-- If running scripts from a terminal, ensure `ABIA_Practica2_Roger_Cai_Pau` is set as the current directory.
+- Run Python scripts from within the `ABIA_Practica2_Roger_Cai_Pau` directory using Visual Studio Code to mirror the development environment.
+- If using a terminal for script execution, ensure that `ABIA_Practica2_Roger_Cai_Pau` is the current working directory.
 
 ## About AI Planning and PDDL
-AI planning with PDDL involves defining actions, goals, and the environment to automate decision-making processes. This project applies these principles to efficiently plan and solve predefined scenarios, demonstrating the practical applications of AI planning in complex systems.
-
+This project demonstrates the application of AI planning and PDDL in solving complex logistical problems like scheduling book readings. It showcases the capability of AI planning to navigate intricate constraints, such as book predecessors and parallel reading timelines, to achieve a balanced and feasible reading plan.
